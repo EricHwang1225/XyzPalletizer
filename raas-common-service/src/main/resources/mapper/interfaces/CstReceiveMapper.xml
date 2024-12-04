@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lgcns.smartwcs.interfaces.repository.CstReceiveMapper">
+
+    <insert id="save" parameterType="com.lgcns.smartwcs.interfaces.model.CstMaster">
+        /* INSERT save */
+        <![CDATA[
+        INSERT INTO wcsdb.TB_COM_CST_MST
+            (CO_CD, CST_CD, CST_NM, USE_YN, REG_ID, REG_DT, UPD_ID, UPD_DT)
+        VALUES
+            (#{coCd}, #{cstCd}, #{cstNm} ,#{useYn}, #{regId}, STR_TO_DATE(#{regDt}, '%Y%m%d%H%i%s'), #{regId}, STR_TO_DATE(#{regDt}, '%Y%m%d%H%i%s'))
+        ON DUPLICATE KEY
+        UPDATE
+            CST_NM = #{cstNm},
+            USE_YN = #{useYn},
+            UPD_ID = #{regId},
+            UPD_DT = STR_TO_DATE(#{regDt}, '%Y%m%d%H%i%s');
+        ]]>
+    </insert>
+
+</mapper>

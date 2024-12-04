@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lgcns.smartwcs.menu.repository.MenuMapper">
+
+    <select id="getMenuTreeList"
+            parameterType="com.lgcns.smartwcs.menu.model.Menu"
+            resultType="com.lgcns.smartwcs.menu.model.Menu">
+        <![CDATA[
+        /* SELECT getMenuTreeList */
+        WITH RECURSIVE CTS AS (
+            SELECT  h.TREE_ID
+                 ,h.PARENT_ID
+                 ,h.MENU_LVL
+                 ,h.USER_LVL
+                 ,h.MENU_ID
+                 ,h.MENU_NM
+                 ,h.MENU_DESC
+                 ,h.SORT_SEQ
+                 ,h.MENU_TYPE
+                 ,h.MENU_URL
+                 ,h.MENU_ICON
+                 ,h.USE_YN
+                 ,CAST(SORT_SEQ  AS CHAR(100)) lvl
+            FROM wcsdb.TB_COM_MENU_MST h
+            WHERE PARENT_ID = ''
+            UNION ALL
+            SELECT b.TREE_ID
+                 ,b.PARENT_ID
+                 ,b.MENU_LVL
+                 ,b.USER_LVL
+                 ,b.MENU_ID
+                 ,b.MENU_NM
+                 ,b.MENU_DESC
+                 ,b.SORT_SEQ
+                 ,b.MENU_TYPE
+                 ,b.MENU_URL
+                 ,b.MENU_ICON
+                 ,b.USE_YN
+                 ,CONCAT(c.lvl, '', LPAD(b.SORT_SEQ, 2, '0') ) lvl
+            FROM wcsdb.TB_COM_MENU_MST b
+                     INNER JOIN CTS c
+                                ON b.PARENT_ID = c.TREE_ID
+        )
+
+        SELECT CONCAT(REPEAT('    ', k.MENU_LVL), 'ㄴ', k.MENU_ID) AS menuId
+             ,k.MENU_NM   AS menuNm
+             ,k.MENU_DESC AS menuDesc
+             ,k.MENU_LVL  AS menuLvl
+             ,k.USER_LVL  AS userLvl
+             ,k.SORT_SEQ  AS sortSeq
+             ,k.MENU_TYPE  AS menuType
+             ,k.MENU_URL  AS menuUrl
+             ,k.MENU_ICON AS menuIcon
+             ,k.TREE_ID   AS treeId
+             ,k.PARENT_ID AS parentId
+             ,k.USE_YN    AS useYn
+             ,CAST(RPAD(k.lvl, 10, '0') AS unsigned) AS orderLvl
+        FROM CTS k
+        WHERE 1 = 1
+       ]]>
+        <if test="list.size != 0">
+            <![CDATA[
+                AND    k.MENU_ID IN
+            ]]>
+            <foreach collection="list" item="item" index="index" separator="," open="(" close=")">
+                #{item.menuId}
+            </foreach>
+        </if>
+        ORDER BY orderLvl
+        ;
+
+    </select>
+
+    <select id="getMenuIdByMenuUrl"
+            parameterType="com.lgcns.smartwcs.menu.model.MenuSearchCondition"
+            resultType="com.lgcns.smartwcs.menu.model.Menu">
+        <![CDATA[
+        /* SELECT getMenuIdByMenuUrl */
+        WITH RECURSIVE CTS AS (SELECT h.TREE_ID
+                                    , h.PARENT_ID
+                                    , h.MENU_ID
+                               FROM wcsdb.TB_COM_MENU_MST h
+                               WHERE MENU_URL = #{menuUrl}
+                               UNION ALL
+                               SELECT b.TREE_ID
+                                    , b.PARENT_ID
+                                    , b.MENU_ID
+                               FROM wcsdb.TB_COM_MENU_MST b
+                                        INNER JOIN CTS c
+                                                   ON b.TREE_ID = c.PARENT_ID)
+
+        SELECT k.MENU_ID
+        FROM CTS k
+        ;
+        ]]>
+    </select>
+
+    <select id="getMenuUnpagedList"
+            parameterType="com.lgcns.smartwcs.menu.model.MenuSearchCondition"
+            resultType="com.lgcns.smartwcs.menu.model.Menu">
+        /* SELECT getMenuUnpagedList */
+        <if test="(menuId != null and menuId != '' )||(menuNm != null and menuNm != '' )||(useYn != null and useYn != '' )">
+            <![CDATA[
+        WITH RECURSIVE CTS AS (
+            SELECT  h.TREE_ID
+                 ,h.PARENT_ID
+                 ,h.MENU_ID
+            FROM wcsdb.TB_COM_MENU_MST h
+            WHERE 1 = 1
+               ]]>
+            <if test="menuId != null and menuId != '' ">
+                <![CDATA[
+              AND MENU_ID LIKE CONCAT('%', #{menuId}, '%')
+               ]]>
+            </if>
+            <if test="menuNm != null and menuNm != '' ">
+                <![CDATA[
+              AND MENU_NM  LIKE CONCAT('%', #{menuNm}, '%')
+               ]]>
+            </if>
+            <if test="useYn != null and useYn != '' ">
+                <![CDATA[
+              AND USE_YN = #{useYn}
+            ]]>
+            </if>
+            <![CDATA[
+            UNION ALL
+            SELECT b.TREE_ID
+                 ,b.PARENT_ID
+                 ,b.MENU_ID
+            FROM wcsdb.TB_COM_MENU_MST b
+                     INNER JOIN CTS c
+                                ON b.TREE_ID  = c.PARENT_ID
+        )
+         ]]>
+        </if>
+        SELECT a.MENU_ID
+        ,a.MENU_NM
+        ,a.MENU_DESC
+        ,a.MENU_LVL
+        ,a.SORT_SEQ
+        ,a.USER_LVL
+        ,a.MENU_TYPE
+        ,a.USE_YN
+        ,a.MENU_URL
+        ,a.MENU_ICON
+        ,a.MAIN_SHOW_ICON
+        ,a.TREE_ID
+        ,a.PARENT_ID
+        ,a.REG_DT
+        FROM wcsdb.TB_COM_MENU_MST a
+        <if test="(menuId != null and menuId != '' )||(menuNm != null and menuNm != '' )||(useYn != null and useYn != '' )">
+            <![CDATA[
+        WHERE a.MENU_ID IN (SELECT k.MENU_ID
+                            FROM CTS k
+                             GROUP BY k.MENU_ID)
+        ]]>
+        </if>
+        ORDER BY a.SORT_SEQ
+        ;
+    </select>
+
+    <select id="getMenuUserLvlList"
+            parameterType="java.lang.String"
+            resultType="java.lang.Integer">
+        /* SELECT getMenuUserLvlList */
+        SELECT USER_LVL
+        FROM wcsdb.TB_COM_MENU_MST a
+        WHERE a.PARENT_ID = #{parentId}
+          AND USER_LVL IS NOT NULL
+        GROUP BY USER_LVL
+        ORDER BY USER_LVL DESC
+        ;
+    </select>
+
+    <select id="getByTreeId"
+            parameterType="java.lang.String"
+            resultType="com.lgcns.smartwcs.menu.model.Menu">
+        /* SELECT getByTreeId */
+        SELECT MENU_ID
+             , MENU_NM
+             , MENU_DESC
+             , MENU_LVL
+             , MENU_TYPE
+             , MENU_URL
+             , MENU_ICON
+             , TREE_ID
+             , PARENT_ID
+             , USER_LVL
+             , USE_YN
+             , SORT_SEQ
+             , MAIN_SHOW_ICON
+             , REG_ID
+             , REG_DT
+             , UPD_ID
+             , UPD_DT
+        FROM wcsdb.TB_COM_MENU_MST a
+        WHERE a.TREE_ID = #{parentId}
+        ;
+    </select>
+
+    <select id="getMenuExcelTreeList"
+            parameterType="com.lgcns.smartwcs.menu.model.MenuSearchCondition"
+            resultType="com.lgcns.smartwcs.menu.model.Menu">
+        /* SELECT getMenuExcelTreeList */
+        <if test="(menuId != null and menuId != '' )||(menuNm != null and menuNm != '' )||(useYn != null and useYn != '' )">
+            <![CDATA[
+        WITH RECURSIVE CTS AS (
+            SELECT  h.TREE_ID
+                 ,h.PARENT_ID
+                 ,h.MENU_ID
+            FROM wcsdb.TB_COM_MENU_MST h
+            WHERE 1 = 1
+               ]]>
+            <if test="menuId != null and menuId != '' ">
+                <![CDATA[
+              AND MENU_ID LIKE CONCAT('%', #{menuId}, '%')
+               ]]>
+            </if>
+            <if test="menuNm != null and menuNm != '' ">
+                <![CDATA[
+              AND MENU_NM  LIKE CONCAT('%', #{menuNm}, '%')
+               ]]>
+            </if>
+            <if test="useYn != null and useYn != '' ">
+                <![CDATA[
+              AND USE_YN = #{useYn}
+            ]]>
+            </if>
+            <![CDATA[
+            UNION ALL
+            SELECT b.TREE_ID
+                 ,b.PARENT_ID
+                 ,b.MENU_ID
+            FROM wcsdb.TB_COM_MENU_MST b
+                     INNER JOIN CTS c
+                                ON b.TREE_ID  = c.PARENT_ID
+        )
+         ]]>
+        </if>
+
+        SELECT MENU_ID AS menuId
+        FROM CTS k
+        GROUP BY MENU_ID;
+
+    </select>
+
+
+</mapper>

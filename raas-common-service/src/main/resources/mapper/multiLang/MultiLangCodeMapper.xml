@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lgcns.smartwcs.multi_language.code.repository.MultiLangCodeMapper">
+
+    <select id="getMultiLangCodeList"
+            parameterType="com.lgcns.smartwcs.multi_language.code.model.MultiLangCode"
+            resultType="com.lgcns.smartwcs.multi_language.code.model.MultiLangCode">
+        <![CDATA[
+        /* SELECT getMultiLangCodeList */
+        SELECT a.COM_HDR_CD      AS comHdrCd
+             , a.COM_DTL_CD      AS comDtlCd
+             , a.COM_DTL_NM      AS comDtlNm
+             , b.COM_DTL_LANG_NM AS comDtlLangNm
+        FROM wcsdb.TB_COM_CODE_MST a
+                 LEFT OUTER JOIN wcsdb.TB_COM_LANG_CODE_MPNG b
+                                 ON (a.CO_CD = b.CO_CD
+                                     AND a.COM_HDR_CD = b.COM_HDR_CD
+                                     AND a.COM_DTL_CD = b.COM_DTL_CD
+                                     AND b.LANG_CD = #{langCd})
+        WHERE 1 = 1
+          AND a.COM_HDR_CD = #{comHdrCd}
+          AND a.USE_YN = 'Y'
+          AND a.HDR_FLAG = 'N'
+        ORDER BY a.SORT_SEQ
+        ;
+        ]]>
+    </select>
+
+    <insert id="saveMultiLangCode" parameterType="com.lgcns.smartwcs.multi_language.code.model.MultiLangCode">
+        /* MERGE saveMultiLangCode */
+        INSERT INTO wcsdb.TB_COM_LANG_CODE_MPNG(LANG_CD, CO_CD, COM_HDR_CD, COM_DTL_CD, COM_DTL_LANG_NM, REG_ID, REG_DT,
+                                                UPD_ID, UPD_DT)
+        VALUES (#{langCd}, 'LGWCS', #{comHdrCd}, #{comDtlCd}, #{comDtlLangNm}, #{regId}, #{regDt}, #{regId},
+                #{regDt}) ON DUPLICATE KEY
+        UPDATE COM_DTL_LANG_NM = #{comDtlLangNm}
+            , UPD_ID = #{regId}
+            , UPD_DT = #{regDt};
+    </insert>
+
+    <select id="getMultiLangCodeExcelList"
+            parameterType="com.lgcns.smartwcs.multi_language.code.model.MultiLangCode"
+            resultType="com.lgcns.smartwcs.multi_language.code.model.MultiLangCode">
+        /* SELECT getMultiLangCodeList */
+        SELECT a.COM_HDR_CD AS comHdrCd
+        ,a.COM_HDR_NM AS comHdrNm
+        , a.COM_DTL_CD AS comDtlCd
+        , a.COM_DTL_NM AS comDtlNm
+        , b.COM_DTL_LANG_NM AS comDtlLangNm
+        FROM wcsdb.TB_COM_CODE_MST a
+        LEFT OUTER JOIN wcsdb.TB_COM_LANG_CODE_MPNG b
+        ON (a.CO_CD = b.CO_CD
+        AND a.COM_HDR_CD = b.COM_HDR_CD
+        AND a.COM_DTL_CD = b.COM_DTL_CD
+        AND b.LANG_CD = #{langCd})
+        WHERE 1 = 1
+        <if test="comHdrCd != null and comHdrCd != '' ">
+            AND a.COM_HDR_CD LIKE CONCAT('%', #{comHdrCd}, '%')
+        </if>
+        <if test="comHdrNm != null and comHdrNm != '' ">
+            AND a.COM_HDR_NM LIKE CONCAT('%', #{comHdrNm}, '%')
+        </if>
+        AND a.HDR_FLAG = 'N'
+        AND a.USE_YN = 'Y'
+        ORDER BY a.COM_HDR_CD, a.SORT_SEQ
+        ;
+    </select>
+
+
+</mapper>

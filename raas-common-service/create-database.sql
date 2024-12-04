@@ -1,0 +1,4 @@
+CREATE DATABASE wcsdb;
+GO
+USE wcsdb;
+GO

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lgcns.smartwcs.port.repository.PortMapper">
+
+    <select id="getPortList"
+            parameterType="com.lgcns.smartwcs.port.model.PortSearchCondition"
+            resultType="com.lgcns.smartwcs.common.utils.UnderscoreToCamelHashMap">
+        <![CDATA[
+        /* SELECT getPortList */
+        SELECT CONCAT_WS(',',a.CO_CD, a.CNTR_CD, a.EQP_ID) AS TREE_ID
+             ,'EQP' AS TREE_TYPE
+             ,a.CO_CD
+             ,a.CNTR_CD
+             ,a.EQP_ID
+              ,a.PORT_ID
+              ,a.PORT_NM
+              ,a.PORT_DESC
+              ,a.PC_IP
+              ,a.LIGHT_IP
+              ,a.LIGHT_USE_YN
+              ,a.SORT_SEQ
+              ,a.USE_YN
+              ,a.REG_DT
+          FROM wcsdb.TB_COM_PORT_MST a
+         WHERE 1 = 1
+   ]]>
+        <if test="coCd != null and coCd != '' ">
+            <![CDATA[
+           AND a.CO_CD = #{coCd}
+        ]]>
+        </if>
+        <if test="cntrCd != null and cntrCd != '' ">
+            <![CDATA[
+           AND a.CNTR_CD = #{cntrCd}
+        ]]>
+        </if>
+        <if test="eqpId != null and eqpId != '' ">
+        <![CDATA[
+           AND a.EQP_ID  = #{eqpId}
+        ]]>
+        </if>
+        ORDER BY a.SORT_SEQ
+        ;
+    </select>
+
+</mapper>

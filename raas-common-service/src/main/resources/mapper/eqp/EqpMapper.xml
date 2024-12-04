@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lgcns.smartwcs.eqp.repository.EqpMapper">
+
+    <select id="getEqpList"
+            parameterType="com.lgcns.smartwcs.eqp.model.EqpSearchCondition"
+            resultType="com.lgcns.smartwcs.common.utils.UnderscoreToCamelHashMap">
+        <![CDATA[
+        /* SELECT getEqpList */
+        SELECT CONCAT_WS(',',a.CO_CD, a.CNTR_CD) AS TREE_ID
+             , 'CNTR' AS TREE_TYPE
+             ,a.CO_CD
+             ,a.CNTR_CD
+             ,a.EQP_ID
+             ,a.EQP_NM
+             ,a.APP_NM
+             ,a.IF_SERV_IP
+             ,a.EQP_DESC
+             ,a.EQP_TYPE_CD
+             ,a.LOC_CD
+             ,a.SORT_SEQ
+             ,a.USE_YN
+             ,a.REG_DT
+          FROM wcsdb.TB_COM_EQP_MST a
+         WHERE 1 = 1
+         ]]>
+        <if test="coCd != null and coCd != '' ">
+        <![CDATA[
+           AND a.CO_CD = #{coCd}
+        ]]>
+        </if>
+        <if test="cntrCd != null and cntrCd != '' ">
+        <![CDATA[
+           AND a.CNTR_CD = #{cntrCd}
+        ]]>
+        </if>
+        ORDER BY a.SORT_SEQ
+        ;
+    </select>
+
+</mapper>

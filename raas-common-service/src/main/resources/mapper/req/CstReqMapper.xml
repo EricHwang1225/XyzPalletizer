@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lgcns.smartwcs.req.cst.repository.CstReqMapper">
+
+    <select id="getCstReqList"
+            parameterType="com.lgcns.smartwcs.req.cst.model.CstReqDTO"
+            resultType="com.lgcns.smartwcs.req.cst.model.CstReqDTO">
+        /* SELECT getCstReqList */
+        SELECT a.CO_CD,
+        a.CST_CD,
+        a.CST_NM,
+        a.USE_YN,
+        a.IF_WCS_YN,
+        a.IF_WCS_STATUS_CD,
+        a.IF_WCS_CNT,
+        a.IF_WCS_DT,
+        a.IF_WCS_MSG,
+        a.WMS_TRACKING_ID,
+        a.WCS_REG_YN,
+        a.REG_DT
+        FROM TB_REQ_CST_MST a
+        <trim prefix="WHERE" prefixOverrides="AND">
+            <if test="coCd != null and coCd != ''">
+                AND a.CO_CD = #{coCd}
+            </if>
+            <if test="cstCd != null and cstCd != ''">
+                AND a.CST_CD LIKE CONCAT('%', #{cstCd},'%')
+            </if>
+            <if test="cstNm != null and cstNm != ''">
+                AND a.CST_NM LIKE CONCAT('%', #{cstNm},'%')
+            </if>
+            <if test="useYn != null and useYn != ''">
+                AND a.USE_YN = #{useYn}
+            </if>
+            <if test="ifWcsYn != null and ifWcsYn != ''">
+                AND a.IF_WCS_YN = #{ifWcsYn}
+            </if>
+        </trim>
+    </select>
+
+    <update id="updateWcsCstRequest"
+            parameterType="com.lgcns.smartwcs.req.cst.model.CstReqDTO">
+        /* SELECT updateWcsCstRequest */
+        UPDATE TB_REQ_CST_MST
+        SET IF_WCS_YN = #{ifWcsYn}
+        , IF_WCS_STATUS_CD = #{ifWcsStatusCd}
+        <choose>
+            <when test='ifWcsYn == "Y" '>
+                , IF_WCS_CNT = 1
+            </when>
+            <otherwise>
+                , IF_WCS_CNT = IF_WCS_CNT + #{ifWcsCnt}
+            </otherwise>
+        </choose>
+        , IF_WCS_DT = NOW()
+        , IF_WCS_MSG = #{ifWcsMsg}
+        , WMS_TRACKING_ID = #{wmsTrackingId}
+        <if test='ifWcsYn == "Y" '>
+            ,WCS_REG_YN = 'Y'
+        </if>
+        WHERE CO_CD = #{coCd}
+        AND CST_CD = #{cstCd}
+    </update>
+</mapper>

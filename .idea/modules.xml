@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/raas-apigateway-service/Palletizer.raas-apigateway-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/raas-apigateway-service/Palletizer.raas-apigateway-service.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/raas-backend-template/Palletizer.raas-backend-template.main.iml" filepath="$PROJECT_DIR$/.idea/modules/raas-backend-template/Palletizer.raas-backend-template.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/raas-common-service/Palletizer.raas-common-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/raas-common-service/Palletizer.raas-common-service.main.iml" />
+    </modules>
+  </component>
+</project>

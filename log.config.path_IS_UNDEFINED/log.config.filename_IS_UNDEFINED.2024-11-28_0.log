@@ -1,0 +1,144 @@
+DEBUG 24-11-28 15:23:14[idle-connection-evictor-1] [PoolingHttpClientConnectionManager:486] - Closing expired connections
+DEBUG 24-11-28 15:23:14[idle-connection-evictor-1] [PoolingHttpClientConnectionManager:486] - Closing expired connections
+DEBUG 24-11-28 15:23:15[DiscoveryClient-CacheRefreshExecutor-0] [InternalHttpClient:164] - ex-0000000042 preparing request execution
+DEBUG 24-11-28 15:23:15[DiscoveryClient-HeartbeatExecutor-0] [InternalHttpClient:164] - ex-0000000043 preparing request execution
+DEBUG 24-11-28 15:23:15[DiscoveryClient-CacheRefreshExecutor-0] [ProtocolExec:181] - ex-0000000042 target auth state: UNCHALLENGED
+DEBUG 24-11-28 15:23:15[DiscoveryClient-HeartbeatExecutor-0] [ProtocolExec:181] - ex-0000000043 target auth state: UNCHALLENGED
+DEBUG 24-11-28 15:23:15[DiscoveryClient-CacheRefreshExecutor-0] [ProtocolExec:187] - ex-0000000042 proxy auth state: UNCHALLENGED
+DEBUG 24-11-28 15:23:15[DiscoveryClient-HeartbeatExecutor-0] [ProtocolExec:187] - ex-0000000043 proxy auth state: UNCHALLENGED
+DEBUG 24-11-28 15:23:15[DiscoveryClient-CacheRefreshExecutor-0] [ConnectExec:123] - ex-0000000042 acquiring connection with route {}->http://127.0.0.1:8761
+DEBUG 24-11-28 15:23:15[DiscoveryClient-HeartbeatExecutor-0] [ConnectExec:123] - ex-0000000043 acquiring connection with route {}->http://127.0.0.1:8761
+DEBUG 24-11-28 15:23:15[DiscoveryClient-CacheRefreshExecutor-0] [InternalHttpClient:101] - ex-0000000042 acquiring endpoint (180000 MILLISECONDS)
+DEBUG 24-11-28 15:23:15[DiscoveryClient-HeartbeatExecutor-0] [InternalHttpClient:101] - ex-0000000043 acquiring endpoint (180000 MILLISECONDS)
+DEBUG 24-11-28 15:23:15[DiscoveryClient-CacheRefreshExecutor-0] [PoolingHttpClientConnectionManager:296] - ex-0000000042 endpoint lease request (180000 MILLISECONDS) [route: {}->http://127.0.0.1:8761][total available: 1; route allocated: 1 of 5; total allocated: 1 of 25]
+DEBUG 24-11-28 15:23:15[DiscoveryClient-HeartbeatExecutor-0] [PoolingHttpClientConnectionManager:296] - ex-0000000043 endpoint lease request (180000 MILLISECONDS) [route: {}->http://127.0.0.1:8761][total available: 1; route allocated: 1 of 5; total allocated: 1 of 25]
+DEBUG 24-11-28 15:23:15[DiscoveryClient-HeartbeatExecutor-0] [PoolingHttpClientConnectionManager:318] - ex-0000000043 endpoint leased [route: {}->http://127.0.0.1:8761][total available: 0; route allocated: 1 of 5; total allocated: 1 of 25]
+DEBUG 24-11-28 15:23:15[DiscoveryClient-CacheRefreshExecutor-0] [PoolingHttpClientConnectionManager:318] - ex-0000000042 endpoint leased [route: {}->http://127.0.0.1:8761][total available: 0; route allocated: 1 of 5; total allocated: 1 of 25]
+DEBUG 24-11-28 15:23:15[DiscoveryClient-HeartbeatExecutor-0] [wire:106] - http-outgoing-4 << "[read] I/O error: Read timed out"
+DEBUG 24-11-28 15:23:15[DiscoveryClient-CacheRefreshExecutor-0] [wire:106] - http-outgoing-3 << "[read] I/O error: Read timed out"
+DEBUG 24-11-28 15:23:15[DiscoveryClient-HeartbeatExecutor-0] [PoolingHttpClientConnectionManager:360] - ex-0000000043 acquired ep-0000000042
+DEBUG 24-11-28 15:23:15[DiscoveryClient-CacheRefreshExecutor-0] [PoolingHttpClientConnectionManager:360] - ex-0000000042 acquired ep-0000000043
+DEBUG 24-11-28 15:23:15[DiscoveryClient-HeartbeatExecutor-0] [InternalHttpClient:116] - ex-0000000043 acquired endpoint ep-0000000042
+DEBUG 24-11-28 15:23:15[DiscoveryClient-CacheRefreshExecutor-0] [InternalHttpClient:116] - ex-0000000042 acquired endpoint ep-0000000043
+DEBUG 24-11-28 15:23:15[DiscoveryClient-CacheRefreshExecutor-0] [MainClientExec:107] - ex-0000000042 executing GET /eureka/apps/delta HTTP/1.1
+DEBUG 24-11-28 15:23:15[DiscoveryClient-HeartbeatExecutor-0] [MainClientExec:107] - ex-0000000043 executing PUT /eureka/apps/PALLETIZER-SERVICE/palletizer-service:5978c8d5f57a3c270aa4b9f54b587b98?status=DOWN&lastDirtyTimestamp=1732774992429 HTTP/1.1
+DEBUG 24-11-28 15:23:15[DiscoveryClient-CacheRefreshExecutor-0] [RequestAddCookies:129] - ex-0000000042 Cookie spec selected: strict
+DEBUG 24-11-28 15:23:15[DiscoveryClient-HeartbeatExecutor-0] [RequestAddCookies:129] - ex-0000000043 Cookie spec selected: strict
+DEBUG 24-11-28 15:23:15[DiscoveryClient-CacheRefreshExecutor-0] [InternalHttpClient:214] - ep-0000000043 start execution ex-0000000042
+DEBUG 24-11-28 15:23:15[DiscoveryClient-CacheRefreshExecutor-0] [PoolingHttpClientConnectionManager:710] - ep-0000000043 executing exchange ex-0000000042 over http-outgoing-3
+DEBUG 24-11-28 15:23:15[DiscoveryClient-HeartbeatExecutor-0] [InternalHttpClient:214] - ep-0000000042 start execution ex-0000000043
+DEBUG 24-11-28 15:23:15[DiscoveryClient-HeartbeatExecutor-0] [PoolingHttpClientConnectionManager:710] - ep-0000000042 executing exchange ex-0000000043 over http-outgoing-4
+DEBUG 24-11-28 15:23:15[DiscoveryClient-CacheRefreshExecutor-0] [headers:200] - http-outgoing-3 >> GET /eureka/apps/delta HTTP/1.1
+DEBUG 24-11-28 15:23:15[DiscoveryClient-CacheRefreshExecutor-0] [headers:203] - http-outgoing-3 >> Accept: application/json, application/xml, text/xml, application/*+json, application/*+xml
+DEBUG 24-11-28 15:23:15[DiscoveryClient-HeartbeatExecutor-0] [headers:200] - http-outgoing-4 >> PUT /eureka/apps/PALLETIZER-SERVICE/palletizer-service:5978c8d5f57a3c270aa4b9f54b587b98?status=DOWN&lastDirtyTimestamp=1732774992429 HTTP/1.1
+DEBUG 24-11-28 15:23:15[DiscoveryClient-CacheRefreshExecutor-0] [headers:203] - http-outgoing-3 >> Accept-Encoding: gzip, x-gzip, deflate
+DEBUG 24-11-28 15:23:15[DiscoveryClient-HeartbeatExecutor-0] [headers:203] - http-outgoing-4 >> Accept: application/json, application/xml, text/xml, application/*+json, application/*+xml
+DEBUG 24-11-28 15:23:15[DiscoveryClient-CacheRefreshExecutor-0] [headers:203] - http-outgoing-3 >> Host: 127.0.0.1:8761
+DEBUG 24-11-28 15:23:15[DiscoveryClient-HeartbeatExecutor-0] [headers:203] - http-outgoing-4 >> Accept-Encoding: gzip, x-gzip, deflate
+DEBUG 24-11-28 15:23:15[DiscoveryClient-CacheRefreshExecutor-0] [headers:203] - http-outgoing-3 >> Connection: keep-alive
+DEBUG 24-11-28 15:23:15[DiscoveryClient-CacheRefreshExecutor-0] [headers:203] - http-outgoing-3 >> User-Agent: Apache-HttpClient/5.2.1 (Java/17.0.9)
+DEBUG 24-11-28 15:23:15[DiscoveryClient-HeartbeatExecutor-0] [headers:203] - http-outgoing-4 >> Host: 127.0.0.1:8761
+DEBUG 24-11-28 15:23:15[DiscoveryClient-CacheRefreshExecutor-0] [wire:92] - http-outgoing-3 >> "GET /eureka/apps/delta HTTP/1.1[\r][\n]"
+DEBUG 24-11-28 15:23:15[DiscoveryClient-HeartbeatExecutor-0] [headers:203] - http-outgoing-4 >> Connection: keep-alive
+DEBUG 24-11-28 15:23:15[DiscoveryClient-CacheRefreshExecutor-0] [wire:92] - http-outgoing-3 >> "Accept: application/json, application/xml, text/xml, application/*+json, application/*+xml[\r][\n]"
+DEBUG 24-11-28 15:23:15[DiscoveryClient-HeartbeatExecutor-0] [headers:203] - http-outgoing-4 >> User-Agent: Apache-HttpClient/5.2.1 (Java/17.0.9)
+DEBUG 24-11-28 15:23:15[DiscoveryClient-CacheRefreshExecutor-0] [wire:92] - http-outgoing-3 >> "Accept-Encoding: gzip, x-gzip, deflate[\r][\n]"
+DEBUG 24-11-28 15:23:15[DiscoveryClient-HeartbeatExecutor-0] [wire:92] - http-outgoing-4 >> "PUT /eureka/apps/PALLETIZER-SERVICE/palletizer-service:5978c8d5f57a3c270aa4b9f54b587b98?status=DOWN&lastDirtyTimestamp=1732774992429 HTTP/1.1[\r][\n]"
+DEBUG 24-11-28 15:23:15[DiscoveryClient-CacheRefreshExecutor-0] [wire:92] - http-outgoing-3 >> "Host: 127.0.0.1:8761[\r][\n]"
+DEBUG 24-11-28 15:23:15[DiscoveryClient-HeartbeatExecutor-0] [wire:92] - http-outgoing-4 >> "Accept: application/json, application/xml, text/xml, application/*+json, application/*+xml[\r][\n]"
+DEBUG 24-11-28 15:23:15[DiscoveryClient-CacheRefreshExecutor-0] [wire:92] - http-outgoing-3 >> "Connection: keep-alive[\r][\n]"
+DEBUG 24-11-28 15:23:15[DiscoveryClient-HeartbeatExecutor-0] [wire:92] - http-outgoing-4 >> "Accept-Encoding: gzip, x-gzip, deflate[\r][\n]"
+DEBUG 24-11-28 15:23:15[DiscoveryClient-CacheRefreshExecutor-0] [wire:92] - http-outgoing-3 >> "User-Agent: Apache-HttpClient/5.2.1 (Java/17.0.9)[\r][\n]"
+DEBUG 24-11-28 15:23:15[DiscoveryClient-HeartbeatExecutor-0] [wire:92] - http-outgoing-4 >> "Host: 127.0.0.1:8761[\r][\n]"
+DEBUG 24-11-28 15:23:15[DiscoveryClient-CacheRefreshExecutor-0] [wire:92] - http-outgoing-3 >> "[\r][\n]"
+DEBUG 24-11-28 15:23:15[DiscoveryClient-HeartbeatExecutor-0] [wire:92] - http-outgoing-4 >> "Connection: keep-alive[\r][\n]"
+DEBUG 24-11-28 15:23:15[DiscoveryClient-HeartbeatExecutor-0] [wire:92] - http-outgoing-4 >> "User-Agent: Apache-HttpClient/5.2.1 (Java/17.0.9)[\r][\n]"
+DEBUG 24-11-28 15:23:15[DiscoveryClient-HeartbeatExecutor-0] [wire:92] - http-outgoing-4 >> "[\r][\n]"
+DEBUG 24-11-28 15:23:15[DiscoveryClient-CacheRefreshExecutor-0] [wire:92] - http-outgoing-3 << "HTTP/1.1 200 [\r][\n]"
+DEBUG 24-11-28 15:23:15[DiscoveryClient-HeartbeatExecutor-0] [wire:92] - http-outgoing-4 << "HTTP/1.1 200 [\r][\n]"
+DEBUG 24-11-28 15:23:15[DiscoveryClient-CacheRefreshExecutor-0] [wire:92] - http-outgoing-3 << "Content-Encoding: gzip[\r][\n]"
+DEBUG 24-11-28 15:23:15[DiscoveryClient-CacheRefreshExecutor-0] [wire:92] - http-outgoing-3 << "Content-Type: application/json[\r][\n]"
+DEBUG 24-11-28 15:23:15[DiscoveryClient-HeartbeatExecutor-0] [wire:92] - http-outgoing-4 << "Content-Length: 0[\r][\n]"
+DEBUG 24-11-28 15:23:15[DiscoveryClient-CacheRefreshExecutor-0] [wire:92] - http-outgoing-3 << "Content-Length: 86[\r][\n]"
+DEBUG 24-11-28 15:23:15[DiscoveryClient-HeartbeatExecutor-0] [wire:92] - http-outgoing-4 << "Date: Thu, 28 Nov 2024 06:23:14 GMT[\r][\n]"
+DEBUG 24-11-28 15:23:15[DiscoveryClient-CacheRefreshExecutor-0] [wire:92] - http-outgoing-3 << "Date: Thu, 28 Nov 2024 06:23:14 GMT[\r][\n]"
+DEBUG 24-11-28 15:23:15[DiscoveryClient-HeartbeatExecutor-0] [wire:92] - http-outgoing-4 << "Keep-Alive: timeout=60[\r][\n]"
+DEBUG 24-11-28 15:23:15[DiscoveryClient-CacheRefreshExecutor-0] [wire:92] - http-outgoing-3 << "Keep-Alive: timeout=60[\r][\n]"
+DEBUG 24-11-28 15:23:15[DiscoveryClient-HeartbeatExecutor-0] [wire:92] - http-outgoing-4 << "Connection: keep-alive[\r][\n]"
+DEBUG 24-11-28 15:23:15[DiscoveryClient-CacheRefreshExecutor-0] [wire:92] - http-outgoing-3 << "Connection: keep-alive[\r][\n]"
+DEBUG 24-11-28 15:23:15[DiscoveryClient-HeartbeatExecutor-0] [wire:92] - http-outgoing-4 << "[\r][\n]"
+DEBUG 24-11-28 15:23:15[DiscoveryClient-CacheRefreshExecutor-0] [wire:92] - http-outgoing-3 << "[\r][\n]"
+DEBUG 24-11-28 15:23:15[DiscoveryClient-CacheRefreshExecutor-0] [wire:106] - http-outgoing-3 << "[0x1f][0xffffff8b][0x8][0x0][0x0][0x0][0x0][0x0][0x0][0xffffffff][0xffffffab]VJ,([0xffffffc8][0xffffffc9]LN,[0xffffffc9][0xffffffcc][0xffffffcf]+V[0xffffffb2][0xffffffaa]V*K-*[0x6][0xffffffb1][0xffffffe3][0xffffffe3]SRsJ[0x12][0xffffff95][0xffffffac][0xffffff94]L[0xffffff8c][0xffffff95]t@[0xffffffca][0xffffff80]B[0x19][0xffffff89][0xffffffc5][0x19][0xffffffc9][0xfffffff9])[0xffffffa9]@[0xffffffd1][0xffffffd0][0xffffff80]x[0xffffffe3]x[0xffffff88][0x4]L[0xffffffbf][0xffffff92]Utlm-[0x0]/[0x13]+[0xffffffbc]S[0x0][0x0][0x0]"
+DEBUG 24-11-28 15:23:15[DiscoveryClient-CacheRefreshExecutor-0] [headers:189] - http-outgoing-3 << HTTP/1.1 200 
+DEBUG 24-11-28 15:23:15[DiscoveryClient-HeartbeatExecutor-0] [headers:189] - http-outgoing-4 << HTTP/1.1 200 
+DEBUG 24-11-28 15:23:15[DiscoveryClient-CacheRefreshExecutor-0] [headers:192] - http-outgoing-3 << Content-Encoding: gzip
+DEBUG 24-11-28 15:23:15[DiscoveryClient-HeartbeatExecutor-0] [headers:192] - http-outgoing-4 << Content-Length: 0
+DEBUG 24-11-28 15:23:15[DiscoveryClient-HeartbeatExecutor-0] [headers:192] - http-outgoing-4 << Date: Thu, 28 Nov 2024 06:23:14 GMT
+DEBUG 24-11-28 15:23:15[DiscoveryClient-CacheRefreshExecutor-0] [headers:192] - http-outgoing-3 << Content-Type: application/json
+DEBUG 24-11-28 15:23:15[DiscoveryClient-HeartbeatExecutor-0] [headers:192] - http-outgoing-4 << Keep-Alive: timeout=60
+DEBUG 24-11-28 15:23:15[DiscoveryClient-HeartbeatExecutor-0] [headers:192] - http-outgoing-4 << Connection: keep-alive
+DEBUG 24-11-28 15:23:15[DiscoveryClient-CacheRefreshExecutor-0] [headers:192] - http-outgoing-3 << Content-Length: 86
+DEBUG 24-11-28 15:23:15[DiscoveryClient-CacheRefreshExecutor-0] [headers:192] - http-outgoing-3 << Date: Thu, 28 Nov 2024 06:23:14 GMT
+DEBUG 24-11-28 15:23:15[DiscoveryClient-CacheRefreshExecutor-0] [headers:192] - http-outgoing-3 << Keep-Alive: timeout=60
+DEBUG 24-11-28 15:23:15[DiscoveryClient-CacheRefreshExecutor-0] [headers:192] - http-outgoing-3 << Connection: keep-alive
+DEBUG 24-11-28 15:23:15[DiscoveryClient-HeartbeatExecutor-0] [MainClientExec:138] - ex-0000000043 connection can be kept alive for 60 SECONDS
+DEBUG 24-11-28 15:23:15[DiscoveryClient-HeartbeatExecutor-0] [InternalHttpClient:256] - ep-0000000042 releasing valid endpoint
+DEBUG 24-11-28 15:23:15[DiscoveryClient-HeartbeatExecutor-0] [PoolingHttpClientConnectionManager:389] - ep-0000000042 releasing endpoint
+DEBUG 24-11-28 15:23:15[DiscoveryClient-HeartbeatExecutor-0] [PoolingHttpClientConnectionManager:408] - ep-0000000042 connection http-outgoing-4 can be kept alive for 60 SECONDS
+DEBUG 24-11-28 15:23:15[DiscoveryClient-CacheRefreshExecutor-0] [MainClientExec:138] - ex-0000000042 connection can be kept alive for 60 SECONDS
+DEBUG 24-11-28 15:23:15[DiscoveryClient-HeartbeatExecutor-0] [PoolingHttpClientConnectionManager:421] - ep-0000000042 connection released [route: {}->http://127.0.0.1:8761][total available: 1; route allocated: 1 of 5; total allocated: 1 of 25]
+DEBUG 24-11-28 15:23:15[DiscoveryClient-HeartbeatExecutor-0] [DiscoveryClient:838] - DiscoveryClient_PALLETIZER-SERVICE/palletizer-service:5978c8d5f57a3c270aa4b9f54b587b98 - Heartbeat status: 200
+DEBUG 24-11-28 15:23:15[DiscoveryClient-CacheRefreshExecutor-0] [InternalHttpClient:256] - ep-0000000043 releasing valid endpoint
+DEBUG 24-11-28 15:23:15[DiscoveryClient-CacheRefreshExecutor-0] [PoolingHttpClientConnectionManager:389] - ep-0000000043 releasing endpoint
+DEBUG 24-11-28 15:23:15[DiscoveryClient-CacheRefreshExecutor-0] [PoolingHttpClientConnectionManager:408] - ep-0000000043 connection http-outgoing-3 can be kept alive for 60 SECONDS
+DEBUG 24-11-28 15:23:15[DiscoveryClient-CacheRefreshExecutor-0] [PoolingHttpClientConnectionManager:421] - ep-0000000043 connection released [route: {}->http://127.0.0.1:8761][total available: 1; route allocated: 1 of 5; total allocated: 1 of 25]
+DEBUG 24-11-28 15:23:15[DiscoveryClient-CacheRefreshExecutor-0] [DiscoveryClient:1089] - Got delta update with apps hashcode UP_3_
+DEBUG 24-11-28 15:23:15[DiscoveryClient-CacheRefreshExecutor-0] [DiscoveryClient:1229] - The total number of instances fetched by the delta processor : 0
+DEBUG 24-11-28 15:23:15[DiscoveryClient-CacheRefreshExecutor-0] [DiscoveryClient:1120] - The total number of all instances in the client now is 3
+WARN  24-11-28 15:23:15[DiscoveryClient-0] [TimedSupervisorTask:90] - task supervisor shutting down, can't accept the task
+INFO  24-11-28 15:23:15[Thread-7] [DiscoveryClient:915] - Unregistering ...
+DEBUG 24-11-28 15:23:15[Thread-7] [InternalHttpClient:164] - ex-0000000044 preparing request execution
+DEBUG 24-11-28 15:23:15[Thread-7] [ProtocolExec:181] - ex-0000000044 target auth state: UNCHALLENGED
+DEBUG 24-11-28 15:23:15[Thread-7] [ProtocolExec:187] - ex-0000000044 proxy auth state: UNCHALLENGED
+DEBUG 24-11-28 15:23:15[Thread-7] [ConnectExec:123] - ex-0000000044 acquiring connection with route {}->http://127.0.0.1:8761
+DEBUG 24-11-28 15:23:15[Thread-7] [InternalHttpClient:101] - ex-0000000044 acquiring endpoint (180000 MILLISECONDS)
+DEBUG 24-11-28 15:23:15[Thread-7] [PoolingHttpClientConnectionManager:296] - ex-0000000044 endpoint lease request (180000 MILLISECONDS) [route: {}->http://127.0.0.1:8761][total available: 1; route allocated: 1 of 5; total allocated: 1 of 25]
+DEBUG 24-11-28 15:23:15[Thread-7] [PoolingHttpClientConnectionManager:318] - ex-0000000044 endpoint leased [route: {}->http://127.0.0.1:8761][total available: 0; route allocated: 1 of 5; total allocated: 1 of 25]
+DEBUG 24-11-28 15:23:15[Thread-7] [PoolingHttpClientConnectionManager:360] - ex-0000000044 acquired ep-0000000044
+DEBUG 24-11-28 15:23:15[Thread-7] [InternalHttpClient:116] - ex-0000000044 acquired endpoint ep-0000000044
+DEBUG 24-11-28 15:23:15[Thread-7] [MainClientExec:107] - ex-0000000044 executing DELETE /eureka/apps/PALLETIZER-SERVICE/palletizer-service:5978c8d5f57a3c270aa4b9f54b587b98 HTTP/1.1
+DEBUG 24-11-28 15:23:15[Thread-7] [RequestAddCookies:129] - ex-0000000044 Cookie spec selected: strict
+DEBUG 24-11-28 15:23:15[Thread-7] [InternalHttpClient:214] - ep-0000000044 start execution ex-0000000044
+DEBUG 24-11-28 15:23:15[Thread-7] [PoolingHttpClientConnectionManager:710] - ep-0000000044 executing exchange ex-0000000044 over http-outgoing-4
+DEBUG 24-11-28 15:23:15[Thread-7] [headers:200] - http-outgoing-4 >> DELETE /eureka/apps/PALLETIZER-SERVICE/palletizer-service:5978c8d5f57a3c270aa4b9f54b587b98 HTTP/1.1
+DEBUG 24-11-28 15:23:15[Thread-7] [headers:203] - http-outgoing-4 >> Accept: application/json, application/xml, text/xml, application/*+json, application/*+xml
+DEBUG 24-11-28 15:23:15[Thread-7] [headers:203] - http-outgoing-4 >> Accept-Encoding: gzip, x-gzip, deflate
+DEBUG 24-11-28 15:23:15[Thread-7] [headers:203] - http-outgoing-4 >> Host: 127.0.0.1:8761
+DEBUG 24-11-28 15:23:15[Thread-7] [headers:203] - http-outgoing-4 >> Connection: keep-alive
+DEBUG 24-11-28 15:23:15[Thread-7] [headers:203] - http-outgoing-4 >> User-Agent: Apache-HttpClient/5.2.1 (Java/17.0.9)
+DEBUG 24-11-28 15:23:15[Thread-7] [wire:92] - http-outgoing-4 >> "DELETE /eureka/apps/PALLETIZER-SERVICE/palletizer-service:5978c8d5f57a3c270aa4b9f54b587b98 HTTP/1.1[\r][\n]"
+DEBUG 24-11-28 15:23:15[Thread-7] [wire:92] - http-outgoing-4 >> "Accept: application/json, application/xml, text/xml, application/*+json, application/*+xml[\r][\n]"
+DEBUG 24-11-28 15:23:15[Thread-7] [wire:92] - http-outgoing-4 >> "Accept-Encoding: gzip, x-gzip, deflate[\r][\n]"
+DEBUG 24-11-28 15:23:15[Thread-7] [wire:92] - http-outgoing-4 >> "Host: 127.0.0.1:8761[\r][\n]"
+DEBUG 24-11-28 15:23:15[Thread-7] [wire:92] - http-outgoing-4 >> "Connection: keep-alive[\r][\n]"
+DEBUG 24-11-28 15:23:15[Thread-7] [wire:92] - http-outgoing-4 >> "User-Agent: Apache-HttpClient/5.2.1 (Java/17.0.9)[\r][\n]"
+DEBUG 24-11-28 15:23:15[Thread-7] [wire:92] - http-outgoing-4 >> "[\r][\n]"
+DEBUG 24-11-28 15:23:15[Thread-7] [wire:92] - http-outgoing-4 << "HTTP/1.1 200 [\r][\n]"
+DEBUG 24-11-28 15:23:15[Thread-7] [wire:92] - http-outgoing-4 << "Content-Length: 0[\r][\n]"
+DEBUG 24-11-28 15:23:15[Thread-7] [wire:92] - http-outgoing-4 << "Date: Thu, 28 Nov 2024 06:23:14 GMT[\r][\n]"
+DEBUG 24-11-28 15:23:15[Thread-7] [wire:92] - http-outgoing-4 << "Keep-Alive: timeout=60[\r][\n]"
+DEBUG 24-11-28 15:23:15[Thread-7] [wire:92] - http-outgoing-4 << "Connection: keep-alive[\r][\n]"
+DEBUG 24-11-28 15:23:15[Thread-7] [wire:92] - http-outgoing-4 << "[\r][\n]"
+DEBUG 24-11-28 15:23:15[Thread-7] [headers:189] - http-outgoing-4 << HTTP/1.1 200 
+DEBUG 24-11-28 15:23:15[Thread-7] [headers:192] - http-outgoing-4 << Content-Length: 0
+DEBUG 24-11-28 15:23:15[Thread-7] [headers:192] - http-outgoing-4 << Date: Thu, 28 Nov 2024 06:23:14 GMT
+DEBUG 24-11-28 15:23:15[Thread-7] [headers:192] - http-outgoing-4 << Keep-Alive: timeout=60
+DEBUG 24-11-28 15:23:15[Thread-7] [headers:192] - http-outgoing-4 << Connection: keep-alive
+DEBUG 24-11-28 15:23:15[Thread-7] [MainClientExec:138] - ex-0000000044 connection can be kept alive for 60 SECONDS
+DEBUG 24-11-28 15:23:15[Thread-7] [InternalHttpClient:256] - ep-0000000044 releasing valid endpoint
+DEBUG 24-11-28 15:23:15[Thread-7] [PoolingHttpClientConnectionManager:389] - ep-0000000044 releasing endpoint
+DEBUG 24-11-28 15:23:15[Thread-7] [PoolingHttpClientConnectionManager:408] - ep-0000000044 connection http-outgoing-4 can be kept alive for 60 SECONDS
+DEBUG 24-11-28 15:23:15[Thread-7] [PoolingHttpClientConnectionManager:421] - ep-0000000044 connection released [route: {}->http://127.0.0.1:8761][total available: 1; route allocated: 1 of 5; total allocated: 1 of 25]
+INFO  24-11-28 15:23:15[Thread-7] [DiscoveryClient:917] - DiscoveryClient_PALLETIZER-SERVICE/palletizer-service:5978c8d5f57a3c270aa4b9f54b587b98 - deregister  status: 200
+INFO  24-11-28 15:23:15[Thread-7] [DiscoveryClient:904] - Completed shut down of DiscoveryClient
+DEBUG 24-11-28 15:23:15[DiscoveryClient-CacheRefreshExecutor-0] [DiscoveryClient:1493] - Completed cache refresh task for discovery. All Apps hash code is Local region apps hashcode: UP_3_, is fetching remote regions? false 

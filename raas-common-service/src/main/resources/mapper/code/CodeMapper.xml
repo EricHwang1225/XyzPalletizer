@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lgcns.smartwcs.code.repository.CodeMapper">
+
+    <select id="getCodeHdrList"
+            parameterType="com.lgcns.smartwcs.code.model.CodeSearchCondition"
+            resultType="com.lgcns.smartwcs.code.model.Code">
+        <![CDATA[
+        /* SELECT getCodeHdrList */
+        SELECT *
+        FROM TB_COM_CODE_MST A
+        WHERE 1 = 1
+          AND A.CO_CD  = 'LGWCS'
+          AND A.HDR_FLAG = 'Y'
+          ]]>
+        <if test="useYn != null and useYn != '' ">
+            <![CDATA[
+                AND A.USE_YN = #{useYn}
+            ]]>
+        </if>
+        <if test="comHdrCd != null and comHdrCd != '' ">
+            <![CDATA[
+                AND A.COM_HDR_CD LIKE CONCAT('%', #{comHdrCd},'%')
+            ]]>
+        </if>
+        <if test="comHdrNm != null and comHdrNm != '' ">
+            <![CDATA[
+                 AND A.COM_HDR_NM LIKE CONCAT('%', #{comHdrNm},'%')
+            ]]>
+        </if>
+        <if test="(useYnDt != null and useYnDt != '') or (comDtlCd != null and comDtlCd != '') or (comDtlNm != null and comDtlNm != '') ">
+            <![CDATA[
+          AND EXISTS (SELECT 1
+                      FROM TB_COM_CODE_MST B
+                      WHERE 1 = 1
+                        AND B.CO_CD = A.CO_CD
+                        ]]>
+            <if test="useYnDt != null and useYnDt != '' ">
+                <![CDATA[
+                                AND B.USE_YN = #{useYnDt}
+                            ]]>
+            </if>
+            <if test="comDtlCd != null and comDtlCd != '' ">
+                <![CDATA[
+                                 AND B.COM_DTL_CD LIKE CONCAT('%', #{comDtlCd},'%')
+                            ]]>
+            </if>
+            <if test="comDtlNm != null and comDtlNm != '' ">
+                <![CDATA[
+                                AND B.COM_DTL_NM LIKE CONCAT('%', #{comDtlNm},'%')
+                            ]]>
+            </if>
+            <![CDATA[
+                        AND B.COM_HDR_CD = A.COM_HDR_CD
+                        AND B.HDR_FLAG = 'N')
+
+        ]]>
+        </if>
+        ;
+    </select>
+    <select id="getCodeLangList"
+            parameterType="com.lgcns.smartwcs.code.model.CodeSearchCondition"
+            resultType="com.lgcns.smartwcs.code.model.Code">
+        <![CDATA[
+        /* SELECT getCodeLangList */
+        SELECT a.COM_DTL_CD as comDtlCd,
+               (SELECT IFNULL(MAX(b.COM_DTL_LANG_NM), a.COM_DTL_NM)
+                FROM wcsdb.TB_COM_LANG_CODE_MPNG b
+                WHERE b.LANG_CD = #{langCd}
+                  AND b.CO_CD = a.CO_CD
+                  AND b.COM_HDR_CD = a.COM_HDR_CD
+                  AND b.COM_DTL_CD = a.COM_DTL_CD ) AS comDtlNm
+        FROM wcsdb.TB_COM_CODE_MST a
+        WHERE a.CO_CD = 'LGWCS'
+          AND a.COM_HDR_CD = #{comHdrCd}
+                  ]]>
+        <if test="comDtlCd != null and comDtlCd != '' ">
+            <![CDATA[
+                   AND a.COM_DTL_CD = #{comDtlCd}
+                ]]>
+        </if>
+        <![CDATA[
+          AND a.USE_YN = 'Y'
+          AND a.HDR_FLAG = 'N'
+        ORDER BY a.SORT_SEQ
+        ]]>
+        ;
+    </select>
+
+</mapper>

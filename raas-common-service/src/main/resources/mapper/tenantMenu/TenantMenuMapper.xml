@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lgcns.smartwcs.tenant_menu.repository.TenantMenuMapper">
+
+    <select id="getTenantMenuTreeList"
+            parameterType="com.lgcns.smartwcs.tenant.model.TenantSearchCondition"
+            resultType="com.lgcns.smartwcs.common.utils.UnderscoreToCamelHashMap">
+    <![CDATA[
+        /* SELECT getTenantMenuTreeList */
+        SELECT A.MENU_ID AS MENU_ID,
+               IFNULL((SELECT MAX(L.MENU_LANG_NM)
+                       FROM wcsdb.TB_COM_LANG_MENU_MPNG L
+                       WHERE 1= 1
+                         AND L.LANG_CD = #{langCd}
+                         AND L.MENU_ID = A.MENU_ID), A.MENU_NM) AS MENU_NM,
+               IFNULL(D.USE_YN, 'N') AS USE_YN,
+               IFNULL((SELECT MAX(L.MENU_LANG_DESC)
+                       FROM wcsdb.TB_COM_LANG_MENU_MPNG L
+                       WHERE 1= 1
+                         AND L.LANG_CD = #{langCd}
+                         AND L.MENU_ID = A.MENU_ID), A.MENU_DESC) AS MENU_DESC,
+               A.TREE_ID AS TREE_ID,
+               A.PARENT_ID AS PARENT_ID
+        FROM TB_COM_MENU_MST A LEFT OUTER JOIN(SELECT B.CO_CD,
+                                                      C.MENU_ID,
+                                                      C.USE_YN
+                                               FROM TB_COM_TENANT_MST B LEFT OUTER JOIN TB_COM_TENANT_MENU_MPNG C
+                                                                                        ON B.CO_CD = C.CO_CD
+                                               WHERE 1=1
+                                                 AND B.CO_CD = #{coCd}
+        ) D
+                                              ON A.MENU_ID = D.MENU_ID
+        WHERE A.USE_YN = 'Y'
+          AND A.USER_LVL IN (2, 3, 4, 5, 6, 7)
+        ORDER BY A.SORT_SEQ
+        ;
+    ]]>
+    </select>
+
+    <insert id="saveTenantMenu" parameterType="com.lgcns.smartwcs.tenant_menu.model.TenantMenu">
+        /* MERGE saveTenantMenu */
+        INSERT INTO TB_COM_TENANT_MENU_MPNG(CO_CD, MENU_ID, USE_YN, REG_ID, REG_DT, UPD_ID, UPD_DT)
+            VALUES (#{coCd}, #{menuId}, #{useYn}, #{regId}, #{regDt}, #{regId}, #{regDt})
+            ON DUPLICATE KEY
+        UPDATE USE_YN = #{useYn}
+            , UPD_ID = #{regId}
+            , UPD_DT = #{regDt};
+    </insert>
+
+
+</mapper>

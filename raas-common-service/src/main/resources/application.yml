@@ -1,0 +1,249 @@
+spring:
+  profiles:
+    active: local
+  devtools:
+    livereload:
+      enabled: true
+  gson:
+    date-format: yyyy-MM-dd HH:mm:ss
+  main:
+    banner-mode: off
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  application:
+    name: common-service
+server:
+  port: 0
+  tomcat:
+    connection-timeout: 120000
+
+eureka:
+  instance:
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+    lease-renewal-interval-in-seconds: 1
+    lease-expiration-duration-in-seconds: 2
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://127.0.0.1:8761/eureka #Eureka Server? ??
+
+# mybatis config
+mybatis:
+  configuration:
+    # ISNULL 함수의 파라메터에 null 이 들어갔을때 에러가 발생함. 이를 해결하기 위한 setting.
+    jdbc-type-for-null: varchar
+    map-underscore-to-camel-case: true
+    useGeneratedKeys: true
+  mapper-locations: /mapper/**/*.xml # root는 기본적으로 resources로 정의되어 있음.
+
+httpclient:
+  setting:
+    connection-timeout: 5000
+    read-timeout: 5000
+    retry-policy: 3
+    max-conn-per-route: 100
+    max-conn-total: 300
+  target:
+    wcs:
+      #오토스토어랑 인터페이스 하기 위한 내부 Backend
+      server: http://localhost:8090/api/as/
+bcrypt:
+  salt: $2a$10$CPmJ1zrw9AMhFX3HaPo8Qu
+wcs:
+  sessionTimeOut: 1800
+---
+# 로컬환경 : local
+spring:
+  config:
+    activate:
+      on-profile: local
+  datasource:
+    url:
+      jdbc:mysql://localhost:3306/palletizer?characterEncoding=UTF-8&serverTimezone=Asia/Seoul&allowMultiQueries=true
+    #      &sslMode=VERIFY_CA&
+    #      clientCertificateKeyStoreUrl=classpath:ssl/dr/keystore.jks&
+    #      clientCertificateKeyStorePassword=raas12345!0&
+    #      trustCertificateKeyStoreUrl=classpath:ssl/dr/truststore.jks&
+    #      trustCertificateKeyStorePassword=raas12345!0
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+    username: root
+    password: root
+
+  jpa:
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQLDialect
+    open-in-view: false
+    generate-ddl: false
+    show_sql: true
+    hibernate:
+      format_sql: true
+      ddl-auto: none
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+logging:
+  level:
+    root: info
+    org:
+      hibernate:
+        type:
+          descriptor:
+            sql: trace
+
+---
+# 개발환경 : dev
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    url:
+      jdbc:mysql://10.1.131.232:3306/wcsdb?characterEncoding=UTF-8&serverTimezone=Asia/Seoul&allowMultiQueries=true
+#      &sslMode=VERIFY_CA&
+#      clientCertificateKeyStoreUrl=classpath:ssl/stg/keystore.jks&
+#      clientCertificateKeyStorePassword=raas12345!0&
+#      trustCertificateKeyStoreUrl=classpath:ssl/stg/truststore.jks&
+#      trustCertificateKeyStorePassword=raas12345!0
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: smartwcs
+    password: smartwcs1234!
+
+  jpa:
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQLDialect
+    open-in-view: false
+    generate-ddl: false
+    show_sql: true
+    hibernate:
+      format_sql: true
+      ddl-auto: none
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+logging:
+  level:
+    root: info
+    org:
+      hibernate:
+        type:
+          descriptor:
+            sql: trace
+
+---
+# 개발환경 : stg
+spring:
+  config:
+    activate:
+      on-profile: stg
+  datasource:
+    #    url: jdbc:sqlserver://awsmssql.c3k06zxlocsd.ap-northeast-2.rds.amazonaws.com:1433;databaseName=wcsdb
+    url: jdbc:mysql://10.1.131.235:3306/wcsdb?characterEncoding=UTF-8&serverTimezone=Asia/Seoul&allowMultiQueries=true
+#      &sslMode=VERIFY_CA&
+#      clientCertificateKeyStoreUrl=classpath:ssl/stg/keystore.jks&
+#      clientCertificateKeyStorePassword=raas12345!0&
+#      trustCertificateKeyStoreUrl=classpath:ssl/stg/truststore.jks&
+#      trustCertificateKeyStorePassword=raas12345!0
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: smartwcs
+    password: smartwcs1234!
+
+  jpa:
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQLDialect
+    open-in-view: false
+    generate-ddl: false
+    show_sql: true
+    hibernate:
+      format_sql: true
+      ddl-auto: none
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+logging:
+  level:
+    root: info
+    org:
+      hibernate:
+        type:
+          descriptor:
+            sql: trace
+
+
+
+---
+# Production환경 : prod
+spring:
+  config:
+    activate:
+      on-profile: prod
+  datasource:
+    #    url: jdbc:sqlserver://awsmssql.c3k06zxlocsd.ap-northeast-2.rds.amazonaws.com:1433;databaseName=wcsdb
+    url: jdbc:mysql://10.1.131.31:3306/wcsdb?characterEncoding=UTF-8&serverTimezone=Asia/Seoul&allowMultiQueries=true
+#      &sslMode=VERIFY_CA&
+#      clientCertificateKeyStoreUrl=classpath:ssl/prd/keystore.jks&
+#      clientCertificateKeyStorePassword=raas12345!0&
+#      trustCertificateKeyStoreUrl=classpath:ssl/prd/truststore.jks&
+#      trustCertificateKeyStorePassword=raas12345!0
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: smartwcs
+    password: smartwcs1234!
+
+  jpa:
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQLDialect
+    open-in-view: false
+    generate-ddl: false
+    show_sql: true
+    hibernate:
+      format_sql: true
+      ddl-auto: none
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+logging:
+  level:
+    root: info
+    org:
+      hibernate:
+        type:
+          descriptor:
+            sql: trace
+---
+# Production환경 : dr
+spring:
+  config:
+    activate:
+      on-profile: dr
+  datasource:
+    #    url: jdbc:sqlserver://awsmssql.c3k06zxlocsd.ap-northeast-2.rds.amazonaws.com:1433;databaseName=wcsdb
+    url: jdbc:mysql://10.1.188.94:3306/wcsdb?characterEncoding=UTF-8&serverTimezone=Asia/Seoul&allowMultiQueries=true
+#      &sslMode=VERIFY_CA&
+#      clientCertificateKeyStoreUrl=classpath:ssl/dr/keystore.jks&
+#      clientCertificateKeyStorePassword=raas12345!0&
+#      trustCertificateKeyStoreUrl=classpath:ssl/dr/truststore.jks&
+#      trustCertificateKeyStorePassword=raas12345!0
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: smartwcs
+    password: smartwcs1234!
+
+  jpa:
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQLDialect
+    open-in-view: false
+    generate-ddl: false
+    show_sql: true
+    hibernate:
+      format_sql: true
+      ddl-auto: none
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+logging:
+  level:
+    root: info
+    org:
+      hibernate:
+        type:
+          descriptor:
+            sql: trace
+---
+# Docker 환경(로컬)
+

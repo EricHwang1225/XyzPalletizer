@@ -1,0 +1,315 @@
+server:
+  port: 8091
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    lease-renewal-interval-in-seconds: 1
+    lease-expiration-duration-in-seconds: 2
+spring:
+  profiles:
+    active: local
+  application:
+    name: apigateway-service
+  cloud:
+    gateway:
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
+      routes:
+        - id: common-service
+          uri: lb://COMMON-SERVICE
+          predicates:
+            - Path=/api/common-service/common/login/**, /api/common-service/healthCheck/**, /interface/common-service/**
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/common-service/(?<segment>.*), /$\{segment}
+        - id: common-service
+          uri: lb://COMMON-SERVICE
+          predicates:
+            - Path=/api/common-service/**
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/common-service/(?<segment>.*), /$\{segment}
+            - AuthorizationHeaderFilter
+        - id: palletizer-service
+          uri: lb://palletizer-service
+          predicates:
+            - Path=/interface/palletizer-service/**, /api/palletizer-service/healthCheck/**
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/palletizer-service/(?<segment>.*), /$\{segment}
+        - id: palletizer-service
+          uri: lb://palletizer-service
+          predicates:
+            - Path=/api/palletizer-service/**
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/autostore-service/(?<segment>.*), /$\{segment}
+            - AuthorizationHeaderFilter
+        - id: roboshuttle-service
+          uri: lb://ROBOSHUTTLE-SERVICE
+          predicates:
+            - Path=/interface/roboshuttle-service/**
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/roboshuttle-service/(?<segment>.*), /$\{segment}
+        - id: roboshuttle-service
+          uri: lb://ROBOSHUTTLE-SERVICE
+          predicates:
+            - Path=/api/roboshuttle-service/**
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/roboshuttle-service/(?<segment>.*), /$\{segment}
+            - AuthorizationHeaderFilter
+        - id: bmart-service
+          uri: lb://BMART-SERVICE
+          predicates:
+            - Path=/interfaceBMT/bmart-service/**,/api/bmart-service/healthCheck/**, /api/bmart-service/BatchObndAlloc/** ,/api/bmart-service/BatchObndAllocCncl/**, /api/bmart-service/BatchBinContent/**
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/bmart-service/(?<segment>.*), /$\{segment}
+        - id: bmart-service
+          uri: lb://BMART-SERVICE
+          predicates:
+            - Path=/api/bmart-service/**
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/bmart-service/(?<segment>.*), /$\{segment}
+            - AuthorizationHeaderFilter
+        - id: lgamr-service
+          uri: lb://LGAMR-SERVICE
+          predicates:
+            - Path=/interfaceTCTK/lgamr-service/**
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/lgamr-service/(?<segment>.*), /$\{segment}
+
+token:
+  secret: user_token
+
+wcs:
+  sessionTimeOut: 1800
+
+# mybatis config
+mybatis:
+  configuration:
+    # ISNULL 함수의 파라메터에 null 이 들어갔을때 에러가 발생함. 이를 해결하기 위한 setting.
+    jdbc-type-for-null: varchar
+    map-underscore-to-camel-case: true
+    useGeneratedKeys: true
+  mapper-locations: /mapper/**/*.xml # root는 기본적으로 resources로 정의되어 있음.
+---
+# 로컬환경 : local
+spring:
+  config:
+    activate:
+      on-profile: local
+  cloud:
+    gateway:
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "http://localhost:5173"
+            allow-credentials: true
+            allowedMethods: '*'
+            allowedHeaders: '*'
+            exposedHeaders: "jwtoken, id"
+      routes:
+        - id: common-service
+          uri: lb://COMMON-SERVICE
+          predicates:
+            - Path=/api/common-service/common/login/**, /api/common-service/healthCheck/**, /interface/common-service/**
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/common-service/(?<segment>.*), /$\{segment}
+        - id: common-service
+          uri: lb://COMMON-SERVICE
+          predicates:
+            - Path=/api/common-service/**
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/common-service/(?<segment>.*), /$\{segment}
+#            - AuthorizationHeaderFilter
+        - id: autostore-service
+          uri: lb://AUTOSTORE-SERVICE
+          predicates:
+            - Path=/interface/autostore-service/**, /api/autostore-service/healthCheck/**
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/autostore-service/(?<segment>.*), /$\{segment}
+        - id: autostore-service
+          uri: lb://AUTOSTORE-SERVICE
+          predicates:
+            - Path=/api/autostore-service/**
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/autostore-service/(?<segment>.*), /$\{segment}
+#            - AuthorizationHeaderFilter
+        - id: roboshuttle-service
+          uri: lb://ROBOSHUTTLE-SERVICE
+          predicates:
+            - Path=/interface/roboshuttle-service/**
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/roboshuttle-service/(?<segment>.*), /$\{segment}
+        - id: roboshuttle-service
+          uri: lb://ROBOSHUTTLE-SERVICE
+          predicates:
+            - Path=/api/roboshuttle-service/**
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/roboshuttle-service/(?<segment>.*), /$\{segment}
+        - id: bmart-service
+          uri: lb://BMART-SERVICE
+          predicates:
+            - Path=/interfaceBMT/bmart-service/**
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/bmart-service/(?<segment>.*), /$\{segment}
+        - id: bmart-service
+          uri: lb://BMART-SERVICE
+          predicates:
+            - Path=/api/bmart-service/**
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/bmart-service/(?<segment>.*), /$\{segment}
+#            - AuthorizationHeaderFilter
+        - id: palletizer-service
+          uri: lb://palletizer-service
+          predicates:
+            - Path=/interface/palletizer-service/**, /api/palletizer-service/healthCheck/**
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/palletizer-service/(?<segment>.*), /$\{segment}
+        - id: palletizer-service
+          uri: lb://palletizer-service
+          predicates:
+            - Path=/api/palletizer-service/**
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/autostore-service/(?<segment>.*), /$\{segment}
+#            - AuthorizationHeaderFilter
+  datasource:
+    url:
+      jdbc:mysql://10.1.131.232:3306/wcsdb?characterEncoding=UTF-8&serverTimezone=Asia/Seoul&allowMultiQueries=true
+#      &sslMode=VERIFY_CA&
+#      clientCertificateKeyStoreUrl=classpath:ssl/dr/keystore.jks&
+#      clientCertificateKeyStorePassword=raas12345!0&
+#      trustCertificateKeyStoreUrl=classpath:ssl/dr/truststore.jks&
+#      trustCertificateKeyStorePassword=raas12345!0
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+    username: smartwcs
+    password: smartwcs1234!
+---
+# 로컬환경 : dev
+spring:
+  config:
+    activate:
+      on-profile: dev
+  cloud:
+    gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "http://localhost:5173, https://raas-dev.singlex.com"
+            allow-credentials: true
+            allowedMethods: '*'
+            allowedHeaders: '*'
+            exposedHeaders: "jwtoken, id"
+  datasource:
+    url:
+      jdbc:mysql://10.1.131.232:3306/wcsdb?characterEncoding=UTF-8&serverTimezone=Asia/Seoul&allowMultiQueries=true
+#      &sslMode=VERIFY_CA&
+#      clientCertificateKeyStoreUrl=classpath:ssl/dr/keystore.jks&
+#      clientCertificateKeyStorePassword=raas12345!0&
+#      trustCertificateKeyStoreUrl=classpath:ssl/dr/truststore.jks&
+#      trustCertificateKeyStorePassword=raas12345!0
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: smartwcs
+    password: smartwcs1234!
+---
+# 로컬환경 : stg
+spring:
+  config:
+    activate:
+      on-profile: stg
+  cloud:
+    gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "https://raas-stg.singlex.com"
+            allow-credentials: true
+            allowedMethods: '*'
+            allowedHeaders: '*'
+            exposedHeaders: "jwtoken, id"
+  datasource:
+    url: jdbc:mysql://10.1.131.235:3306/wcsdb?characterEncoding=UTF-8&serverTimezone=Asia/Seoul&allowMultiQueries=true
+#      &sslMode=VERIFY_CA&
+#      clientCertificateKeyStoreUrl=classpath:ssl/stg/keystore.jks&
+#      clientCertificateKeyStorePassword=raas12345!0&
+#      trustCertificateKeyStoreUrl=classpath:ssl/stg/truststore.jks&
+#      trustCertificateKeyStorePassword=raas12345!0
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: smartwcs
+    password: smartwcs1234!
+---
+# 로컬환경 : prod
+spring:
+  config:
+    activate:
+      on-profile: prod
+  cloud:
+    gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "https://raas.singlex.com"
+            allow-credentials: true
+            allowedMethods: '*'
+            allowedHeaders: '*'
+            exposedHeaders: "jwtoken, id"
+  datasource:
+    url: jdbc:mysql://10.1.131.31:3306/wcsdb?characterEncoding=UTF-8&serverTimezone=Asia/Seoul&allowMultiQueries=true
+#      &sslMode=VERIFY_CA&
+#      clientCertificateKeyStoreUrl=classpath:ssl/prd/keystore.jks&
+#      clientCertificateKeyStorePassword=raas12345!0&
+#      trustCertificateKeyStoreUrl=classpath:ssl/prd/truststore.jks&
+#      trustCertificateKeyStorePassword=raas12345!0
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: smartwcs
+    password: smartwcs1234!
+---
+# 로컬환경 : dr
+spring:
+  config:
+    activate:
+      on-profile: dr
+  cloud:
+    gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "https://raas.singlex.com"
+            allow-credentials: true
+            allowedMethods: '*'
+            allowedHeaders: '*'
+            exposedHeaders: "jwtoken, id"
+  datasource:
+    url: jdbc:mysql://10.1.188.94:3306/wcsdb?characterEncoding=UTF-8&serverTimezone=Asia/Seoul&allowMultiQueries=true
+#      &sslMode=VERIFY_CA&
+#      clientCertificateKeyStoreUrl=classpath:ssl/dr/keystore.jks&
+#      clientCertificateKeyStorePassword=raas12345!0&
+#      trustCertificateKeyStoreUrl=classpath:ssl/dr/truststore.jks&
+#      trustCertificateKeyStorePassword=raas12345!0
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: smartwcs
+    password: smartwcs1234!
+

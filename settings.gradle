@@ -1,0 +1,5 @@
+rootProject.name = 'Palletizer'
+include 'raas-backend-template'
+include 'raas-discovery-service'
+include 'raas-apigateway-service'
+include 'raas-common-service'

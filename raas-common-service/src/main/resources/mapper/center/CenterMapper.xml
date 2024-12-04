@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lgcns.smartwcs.center.repository.CenterMapper">
+
+    <select id="getTenantCntrUnpagedList"
+            parameterType="com.lgcns.smartwcs.center.model.CenterSearchCondition"
+            resultType="com.lgcns.smartwcs.common.utils.UnderscoreToCamelHashMap">
+        <![CDATA[
+        /* SELECT getTenantCntrUnpagedList */
+        SELECT a.CNTR_CD,
+               a.CNTR_NM
+          FROM wcsdb.TB_COM_CENTER_MST  a
+         WHERE 1 = 1
+           AND a.USE_YN = 'Y'
+          ]]>
+        <if test="coCd != null and coCd != '' ">
+            <![CDATA[
+          AND a.CO_CD LIKE CONCAT('%', #{coCd}, '%')
+          ]]>
+        </if>
+        <if test="cntrCd != null and cntrCd != '' ">
+            <![CDATA[
+          AND a.CNTR_CD LIKE CONCAT('%', #{cntrCd}, '%')
+          ]]>
+        </if>
+        <if test="cntrNm != null and cntrNm != '' ">
+            <![CDATA[
+          AND a.CNTR_NM LIKE CONCAT('%', #{cntrNm}, '%')
+          ]]>
+        </if>
+        <if test="(userId != null and userId != '') ||  (userNm != null and userNm != '') || (useYn != null and useYn != '')">
+            AND EXISTS (SELECT 1
+            FROM wcsdb.TB_COM_USER_MST b
+            WHERE 1 = 1
+            AND b.CO_CD = a.CO_CD
+            AND b.CNTR_CD = a.CNTR_CD
+            AND b.USER_LVL = 3
+            <if test="userId != null and userId != '' ">
+                <![CDATA[
+                        AND b.USER_ID LIKE CONCAT('%', #{userId}, '%')
+                        ]]>
+            </if>
+            <if test="userNm != null and userNm != '' ">
+                <![CDATA[
+                        AND b.USER_NM LIKE CONCAT('%', #{userNm}, '%')
+                         ]]>
+            </if>
+            <if test="useYn != null and useYn != '' ">
+                <![CDATA[
+                        AND b.USE_YN = #{useYn}
+                        ]]>
+            </if>
+            )
+        </if>
+        ;
+    </select>
+
+    <select id="getTenantCntrListForLogin"
+            parameterType="com.lgcns.smartwcs.center.model.CenterSearchCondition"
+            resultType="com.lgcns.smartwcs.common.utils.UnderscoreToCamelHashMap">
+        <![CDATA[
+        /* SELECT getTenantCntrListForLogin */
+        SELECT a.CNTR_CD,
+               a.CNTR_NM
+          FROM wcsdb.TB_COM_CENTER_MST  a
+         WHERE 1 = 1
+           AND a.USE_YN = 'Y'
+       ]]>
+        <if test="coCd != null and coCd != '' ">
+            <![CDATA[
+          AND a.CO_CD = #{coCd}
+          ]]>
+        </if>
+        ;
+    </select>
+
+    <select id="getTenantCntrTotalCnt"
+            parameterType="com.lgcns.smartwcs.center.model.CenterSearchCondition"
+            resultType="java.lang.Integer">
+        <![CDATA[
+        /* SELECT getTenantCntrTotalCnt */
+        SELECT COUNT(*) AS totalCnt
+          FROM wcsdb.TB_COM_CENTER_MST  a
+         WHERE 1 = 1
+           AND a.USE_YN = 'Y'
+          ]]>
+        <if test="coCd != null and coCd != '' ">
+            <![CDATA[
+          AND a.CO_CD LIKE CONCAT('%', #{coCd}, '%')
+          ]]>
+        </if>
+        <if test="cntrCd != null and cntrCd != '' ">
+            <![CDATA[
+          AND a.CNTR_CD LIKE CONCAT('%', #{cntrCd}, '%')
+          ]]>
+        </if>
+        <if test="cntrNm != null and cntrNm != '' ">
+            <![CDATA[
+          AND a.CNTR_NM LIKE CONCAT('%', #{cntrNm}, '%')
+          ]]>
+        </if>
+        <if test="(userId != null and userId != '') ||  (userNm != null and userNm != '') || (useYn != null and useYn != '')">
+            AND EXISTS (SELECT 1
+            FROM wcsdb.TB_COM_USER_MST b
+            WHERE 1 = 1
+            AND b.CO_CD = a.CO_CD
+            AND b.CNTR_CD = a.CNTR_CD
+            AND b.USER_LVL = 3
+            <if test="userId != null and userId != '' ">
+                <![CDATA[
+                        AND b.USER_ID LIKE CONCAT('%', #{userId}, '%')
+                        ]]>
+            </if>
+            <if test="userNm != null and userNm != '' ">
+                <![CDATA[
+                        AND b.USER_NM LIKE CONCAT('%', #{userNm}, '%')
+                         ]]>
+            </if>
+            <if test="useYn != null and useYn != '' ">
+                <![CDATA[
+                        AND b.USE_YN = #{useYn}
+                        ]]>
+            </if>
+            )
+        </if>
+        ;
+    </select>
+
+    <select id="getCntrList"
+            parameterType="com.lgcns.smartwcs.center.model.CenterSearchCondition"
+            resultType="com.lgcns.smartwcs.common.utils.UnderscoreToCamelHashMap">
+        <![CDATA[
+        /* SELECT getCntrList */
+        SELECT a.CO_CD AS TREE_ID
+             , 'TENANT' AS TREE_TYPE
+             ,a.CO_CD
+             ,a.CNTR_CD
+             ,a.CNTR_NM
+             ,a.ADDR
+             ,a.TEL_NO
+             ,a.CNTR_EMAIL
+             ,a.SORT_SEQ
+             ,a.USE_YN
+             ,a.REG_DT
+        FROM wcsdb.TB_COM_CENTER_MST a
+        WHERE 1 = 1
+          ]]>
+        <if test="coCd != null and coCd != '' ">
+            <![CDATA[
+            AND a.CO_CD = #{coCd}
+                ]]>
+        </if>
+        ORDER BY a.SORT_SEQ
+        ;
+    </select>
+
+</mapper>

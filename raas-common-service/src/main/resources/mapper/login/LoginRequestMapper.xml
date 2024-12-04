@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lgcns.smartwcs.login.repository.LoginRequestMapper">
+
+    <select id="getLogin"
+            parameterType="com.lgcns.smartwcs.user.model.User"
+            resultType="com.lgcns.smartwcs.login.model.LoginResponse">
+    <![CDATA[
+        /* SELECT getLogin */
+        SELECT MAX(UM.USER_ID)                                              AS userId,
+               IFNULL(MAX(UM.PWD_INIT_YN), 'N')                             AS pwdInitYn,
+               IFNULL(MAX(UM.LOGIN_FAIL_CNT), 0)                            AS loginFailCnt,
+               TIMESTAMPDIFF(DAY, IFNULL(MAX(UM.PWD_CHG_DT), NOW()), NOW()) AS pwdChgDiff,
+               UM.ROLE_CD                                                   AS roleCd,
+               UM.USER_NM                                                   AS userNm,
+               IFNULL(UM.KIOSK_YN, 'N')                                     AS kioskYn
+        FROM wcsdb.TB_COM_USER_MST UM
+        WHERE 1 = 1
+          AND USER_ID = #{userId}
+          AND USE_YN = 'Y'
+        ;
+        ]]>
+    </select>
+
+    <update id="updateLoginFailCnt"
+            parameterType="com.lgcns.smartwcs.user.model.User">
+    <![CDATA[
+        /* UPDATE updateLoginFailCnt */
+        UPDATE
+            TB_COM_USER_MST
+        SET LOGIN_FAIL_CNT = LOGIN_FAIL_CNT + 1,
+            UPD_ID         = #{userId},
+            UPD_DT         = NOW()
+        WHERE 1 = 1
+          AND USER_ID = #{userId}
+        ;
+        ]]>
+    </update>
+
+    <update id="updatePasswordChangeComplete"
+            parameterType="com.lgcns.smartwcs.user.model.User">
+    <![CDATA[
+        /* UPDATE updatePasswordChangeComplete */
+        UPDATE wcsdb.TB_COM_USER_MST
+        SET PWD            = #{pwd}
+          , SALT           = #{salt}
+          , UPD_ID         = #{userId}
+          , LOGIN_FAIL_CNT = 0
+          , PWD_INIT_YN    = 'N'
+          , PWD_CHG_DT     = NOW()
+          , UPD_DT         = NOW()
+        WHERE USER_ID = #{userId}
+        ;
+        ]]>
+    </update>
+
+    <update id="updateLoginComplete"
+            parameterType="com.lgcns.smartwcs.user.model.User">
+    <![CDATA[
+        /* UPDATE updateLoginComplete */
+        UPDATE wcsdb.TB_COM_USER_MST
+        SET FIRST_LOGIN_DT = CASE
+                                 WHEN FIRST_LOGIN_DT IS NULL THEN NOW()
+                                 ELSE FIRST_LOGIN_DT END,
+            LOGIN_DT       = NOW(),
+            LOGIN_FAIL_CNT = 0,
+            LOGIN_YN       = 'Y',
+            UPD_ID         = #{userId},
+            UPD_DT         = NOW()
+        WHERE CO_CD = #{coCd}
+          AND CNTR_CD = #{cntrCd}
+          AND USER_ID = #{userId}
+        ;
+        ]]>
+    </update>
+
+    <update id="updateLogoutComplete"
+            parameterType="com.lgcns.smartwcs.user.model.User">
+    <![CDATA[
+        /* UPDATE updateLogoutComplete */
+        UPDATE wcsdb.TB_COM_USER_MST
+        SET LOGOUT_DT = NOW(),
+            LOGIN_YN  = 'N',
+            UPD_ID    = #{userId},
+            UPD_DT    = NOW()
+        WHERE 1 = 1
+          AND CO_CD = #{coCd}
+          AND CNTR_CD = #{cntrCd}
+          AND USER_ID = #{userId}
+        ;
+        ]]>
+    </update>
+
+    <insert id="insertLoginAccessLog"
+            parameterType="com.lgcns.smartwcs.login.model.LoginAccess">
+    <![CDATA[
+        /* INSERT insertLoginAccessLog */
+        INSERT INTO TB_COM_ACCESS_LOG
+        (CO_CD, CNTR_CD, USER_ID, USER_NM, ACCESS_TYPE_CD, ACCESS_EXEC_DT, ACCESS_EXEC_IP, ACCESS_EXEC_INFO, REG_ID,
+         REG_DT)
+        VALUES (#{coCd}, #{cntrCd}, #{userId}, #{userNm}, #{accessTypeCd}, NOW(), #{accessExecIp}, #{accessExecInfo},
+                #{userId}, NOW());
+        ]]>
+    </insert>
+
+    <select id="getUserRoleMenuLvl1"
+            parameterType="com.lgcns.smartwcs.login.model.Login"
+            resultType="com.lgcns.smartwcs.login.model.RoleMenuResponse">
+        <![CDATA[
+        /* SELECT getUserRoleMenuLvl1 */
+        SELECT H.MENU_ID                                          AS MENU_ID,
+               IFNULL((SELECT MAX(L.MENU_LANG_NM)
+                       FROM wcsdb.TB_COM_LANG_MENU_MPNG L
+                       WHERE L.LANG_CD = #{langCd}
+                         AND L.MENU_ID = H.MENU_ID), H.MENU_NM)   AS MENU_NM,
+               IFNULL((SELECT MAX(L.MENU_LANG_DESC)
+                       FROM wcsdb.TB_COM_LANG_MENU_MPNG L
+                       WHERE L.LANG_CD = #{langCd}
+                         AND L.MENU_ID = H.MENU_ID), H.MENU_DESC) AS MENU_DESC,
+               H.MENU_LVL                                         AS MENU_LVL,
+               H.MENU_TYPE                                        AS MENU_TYPE,
+               H.MENU_URL                                         AS MENU_URL,
+               H.MENU_ICON                                        AS MENU_ICON,
+               H.SORT_SEQ                                         AS SORT_SEQ,
+               H.TREE_ID                                          AS TREE_ID,
+               H.PARENT_ID                                        AS PARENT_ID,
+               'A'                                                AS ROLE_MENU_CD
+        FROM TB_COM_MENU_MST H
+        WHERE H.USER_LVL IN (1, 4, 5, 7)
+          AND H.USE_YN = 'Y'
+        ORDER BY SORT_SEQ;
+        ]]>
+    </select>
+
+    <select id="getUserRoleMenuLvl2"
+            parameterType="com.lgcns.smartwcs.login.model.Login"
+            resultType="com.lgcns.smartwcs.login.model.RoleMenuResponse">
+        <![CDATA[
+        /* SELECT getUserRoleMenuLvl2 */
+        SELECT H.MENU_ID AS MENU_ID,
+               IFNULL((SELECT MAX(L.MENU_LANG_NM)
+                             FROM wcsdb.TB_COM_LANG_MENU_MPNG L
+                             WHERE L.LANG_CD = #{langCd}
+                               AND L.MENU_ID = H.MENU_ID), H.MENU_NM)  AS MENU_NM,
+               IFNULL((SELECT MAX(L.MENU_LANG_DESC)
+                           FROM wcsdb.TB_COM_LANG_MENU_MPNG L
+                           WHERE L.LANG_CD = #{langCd}
+                             AND L.MENU_ID = H.MENU_ID), H.MENU_DESC)  AS MENU_DESC,
+               H.MENU_LVL AS MENU_LVL,
+               H.MENU_TYPE AS MENU_TYPE,
+               H.MENU_URL AS MENU_URL,
+               H.MENU_ICON AS MENU_ICON,
+               H.SORT_SEQ AS SORT_SEQ,
+               H.TREE_ID AS TREE_ID,
+               H.PARENT_ID AS PARENT_ID,
+               'A' AS ROLE_MENU_CD
+        FROM (SELECT A.CO_CD AS CO_CD,
+                     B.MENU_ID AS MENU_ID
+              FROM TB_COM_TENANT_MST A  JOIN TB_COM_TENANT_MENU_MPNG B
+                                             ON A.CO_CD = B.CO_CD
+              WHERE 1 = 1
+                  AND A.CO_CD = #{coCd}
+                AND B.USE_YN = 'Y') E  JOIN TB_COM_MENU_MST H
+                                            ON E.MENU_ID = H.MENU_ID
+        WHERE 1 = 1
+        ]]>
+        <choose>
+            <when test="cntrCd != null and cntrCd != '' ">
+                <![CDATA[
+          AND H.USER_LVL IN (3, 5, 6, 7)
+           ]]>
+            </when>
+            <otherwise>
+                <![CDATA[
+          AND H.USER_LVL IN (2, 4, 6, 7)
+          ]]>
+            </otherwise>
+        </choose>
+        <![CDATA[
+          AND H.USE_YN  = 'Y'
+        ORDER BY SORT_SEQ;
+        ]]>
+    </select>
+
+    <select id="getUserRoleMenuLvl3"
+            parameterType="com.lgcns.smartwcs.login.model.Login"
+            resultType="com.lgcns.smartwcs.login.model.RoleMenuResponse">
+        <![CDATA[
+        /* SELECT getUserRoleMenuLvl3 */
+        SELECT H.MENU_ID                                          AS MENU_ID,
+               IFNULL((SELECT MAX(L.MENU_LANG_NM)
+                       FROM wcsdb.TB_COM_LANG_MENU_MPNG L
+                       WHERE L.LANG_CD = #{langCd}
+                         AND L.MENU_ID = H.MENU_ID), H.MENU_NM)   AS MENU_NM,
+               IFNULL((SELECT MAX(L.MENU_LANG_DESC)
+                       FROM wcsdb.TB_COM_LANG_MENU_MPNG L
+                       WHERE L.LANG_CD = #{langCd}
+                         AND L.MENU_ID = H.MENU_ID), H.MENU_DESC) AS MENU_DESC,
+               H.MENU_LVL                                         AS MENU_LVL,
+               H.MENU_TYPE                                        AS MENU_TYPE,
+               H.MENU_URL                                         AS MENU_URL,
+               H.MENU_ICON                                        AS MENU_ICON,
+               H.SORT_SEQ                                         AS SORT_SEQ,
+               H.TREE_ID                                          AS TREE_ID,
+               H.PARENT_ID                                        AS PARENT_ID,
+               G.ROLE_MENU_CD                                     AS ROLE_MENU_CD
+
+        FROM (SELECT F.MENU_ID      AS MENU_ID,
+                     F.ROLE_MENU_CD AS ROLE_MENU_CD
+              FROM (SELECT A.CO_CD   AS CO_CD,
+                           B.MENU_ID AS MENU_ID
+                    FROM TB_COM_TENANT_MST A
+                             JOIN TB_COM_TENANT_MENU_MPNG B
+                                  ON A.CO_CD = B.CO_CD
+                    WHERE 1 = 1
+                      AND A.CO_CD = #{coCd}
+                      AND B.USE_YN = 'Y') E
+                       JOIN (SELECT C.CO_CD        AS CO_CD,
+                                    C.MENU_ID      AS MENU_ID,
+                                    C.ROLE_MENU_CD AS ROLE_MENU_CD
+                             FROM TB_COM_ROLE_MENU_MPNG C
+                                      JOIN TB_COM_USER_MST D
+                                           ON (C.CO_CD = D.CO_CD
+                                               AND C.CNTR_CD = D.CNTR_CD
+                                               AND C.ROLE_CD = D.ROLE_CD)
+                             WHERE 1 = 1
+                               AND C.CO_CD = #{coCd}
+                               AND C.CNTR_CD = #{cntrCd}
+                               AND D.USER_ID = #{userId}
+                               AND C.ROLE_MENU_CD IN ('A', 'R')) F
+              WHERE E.CO_CD = F.CO_CD
+                AND E.MENU_ID = F.MENU_ID) G
+                 JOIN TB_COM_MENU_MST H
+                      ON G.MENU_ID = H.MENU_ID
+        WHERE H.USER_LVL IN (3, 5, 6, 7)
+          AND H.USE_YN = 'Y'
+        ORDER BY SORT_SEQ;
+        ]]>
+    </select>
+
+    <select id="getEqpPortId"
+            parameterType="com.lgcns.smartwcs.port.model.Port"
+            resultType="com.lgcns.smartwcs.common.utils.UnderscoreToCamelHashMap">
+        <![CDATA[
+        /* SELECT getPortId */
+        SELECT IFNULL(MAX(a.EQP_ID), '')  AS EQP_ID
+             , IFNULL(MAX(a.PORT_ID), '') AS PORT_ID
+             , IFNULL(MAX(b.EQP_NM), '')  AS EQP_NM
+        FROM wcsdb.TB_COM_PORT_MST a
+                 JOIN wcsdb.TB_COM_EQP_MST b
+                      ON (a.CO_CD = b.CO_CD
+                          AND a.CNTR_CD = b.CNTR_CD
+                          AND a.EQP_ID = b.EQP_ID)
+        WHERE 1 = 1
+          AND a.CO_CD = #{coCd}
+          AND a.CNTR_CD = #{cntrCd}
+          AND a.PC_IP = #{pcIp}
+          AND b.USE_YN = 'Y'
+          AND a.USE_YN = 'Y'
+        ;
+        ]]>
+    </select>
+
+
+</mapper>

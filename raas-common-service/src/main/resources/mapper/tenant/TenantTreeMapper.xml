@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lgcns.smartwcs.tenant.repository.TenantTreeMapper">
+
+    <select id="getTenantTreeList"
+            parameterType="com.lgcns.smartwcs.tenant.model.TenantSearchCondition"
+            resultType="com.lgcns.smartwcs.common.utils.UnderscoreToCamelHashMap">
+
+        /* SELECT getTenantTreeList */
+        <if test="coNm == null or coNm == '' ">
+            SELECT T.CO_CD AS TREE_ID,
+            '' AS PARENT_ID,
+            T.CO_NM AS TREE_NM,
+            0 AS DPTH,
+            'SUPER' AS TREE_TYPE,
+            'Super Tenant' AS TREE_TYPE_NM,
+            T.SORT_SEQ AS SORT_SEQ,
+            T.CO_CD AS CO_CD
+            FROM wcsdb.TB_COM_TENANT_MST T
+            WHERE T.CO_CD = 'LGWCS'
+            UNION
+        </if>
+        <![CDATA[
+        SELECT T.CO_CD    AS TREE_ID,
+               'LGWCS'    AS PARENT_ID,
+               T.CO_NM    AS TREE_NM,
+               1          AS DPTH,
+               'TENANT'   AS TREE_TYPE,
+               'Tenant'   AS TREE_TYPE_NM,
+               T.SORT_SEQ AS SORT_SEQ,
+               T.CO_CD    AS CO_CD
+        FROM wcsdb.TB_COM_TENANT_MST T
+        WHERE T.CO_CD <> 'LGWCS'
+           ]]>
+        <if test="coNm != null and coNm != '' ">
+            <![CDATA[
+          AND T.CO_NM LIKE CONCAT('%', #{coNm}, '%')
+        ]]>
+        </if>
+        <![CDATA[
+        UNION
+        SELECT CONCAT_WS(',', C.CO_CD, C.CNTR_CD) AS TREE_ID,
+               C.CO_CD                            AS PARENT_ID,
+               C.CNTR_NM                          AS TREE_NM,
+               2                                  AS DPTH,
+               'CNTR'                             AS TREE_TYPE,
+               'Center'                           AS TREE_TYPE_NM,
+               C.SORT_SEQ                         AS SORT_SEQ,
+               C.CO_CD                            AS CO_CD
+        FROM wcsdb.TB_COM_CENTER_MST C
+        WHERE 1 = 1
+           ]]>
+        <if test="coNm != null and coNm != '' ">
+            <![CDATA[
+          AND C.CO_CD IN (SELECT CO_CD
+                          FROM wcsdb.TB_COM_TENANT_MST
+                          WHERE CO_NM LIKE CONCAT('%', #{coNm}, '%'))
+        ]]>
+        </if>
+        <![CDATA[
+        UNION
+        SELECT CONCAT_WS(',', E.CO_CD, E.CNTR_CD, E.EQP_ID) AS TREE_ID,
+               CONCAT_WS(',', E.CO_CD, E.CNTR_CD)           AS PARENT_ID,
+               E.EQP_NM                                     AS TREE_NM,
+               3                                            AS DPTH,
+               'EQP'                                        AS TREE_TYPE,
+               'Equipment'                                  AS TREE_TYPE_NM,
+               E.SORT_SEQ                                   AS SORT_SEQ,
+               E.CO_CD                                      AS CO_CD
+        FROM wcsdb.TB_COM_EQP_MST E
+        WHERE 1 = 1
+                  ]]>
+        <if test="coNm != null and coNm != '' ">
+            <![CDATA[
+          AND E.CO_CD IN (SELECT CO_CD
+                          FROM wcsdb.TB_COM_TENANT_MST
+                          WHERE CO_NM LIKE CONCAT('%', #{coNm}, '%'))
+        ]]>
+        </if>
+        ORDER BY DPTH,
+        SORT_SEQ
+
+    </select>
+    <select id="getTenantList"
+            parameterType="com.lgcns.smartwcs.tenant.model.TenantSearchCondition"
+            resultType="com.lgcns.smartwcs.common.utils.UnderscoreToCamelHashMap">
+        <![CDATA[
+        /* SELECT getTenantList */
+        SELECT 'LGWCS'                                 AS TREE_ID
+             , 'SUPER'                                 AS TREE_TYPE
+             , a.CO_CD
+             , a.CO_NM
+             , IFNULL(a.TENANT_ICON, 'lgcns-logo.png') AS TENANT_ICON
+             , a.ADDR
+             , a.TEL_NO
+             , a.TENANT_EMAIL
+             , a.CONTR_STRT_YMD
+             , a.CONTR_END_YMD
+             , a.BKGD_COLOR
+             , a.SORT_SEQ
+             , a.USE_YN
+             , a.REG_DT
+        FROM wcsdb.TB_COM_TENANT_MST a
+        WHERE 1 = 1
+          AND a.CO_CD <> 'LGWCS'
+        ORDER BY a.SORT_SEQ
+        ;
+        ]]>
+    </select>
+
+    <select id="getTenantForUserList"
+            parameterType="com.lgcns.smartwcs.tenant.model.TenantSearchCondition"
+            resultType="com.lgcns.smartwcs.common.utils.UnderscoreToCamelHashMap">
+        <![CDATA[
+        /* SELECT getTenantForUserList */
+        SELECT CO_CD
+              ,CO_NM
+        FROM wcsdb.TB_COM_TENANT_MST a
+        WHERE 1 = 1
+          AND a.USE_YN = 'Y'
+          AND a.CO_CD <> 'LGWCS'
+          ]]>
+        <if test="coCd != null and coCd != '' ">
+            <![CDATA[
+          AND a.CO_CD LIKE CONCAT('%', #{coCd}, '%')
+          ]]>
+        </if>
+        <if test="coNm != null and coNm != '' ">
+            <![CDATA[
+          AND a.CO_NM LIKE CONCAT('%', #{coNm}, '%')
+          ]]>
+        </if>
+        <if test="(userId != null and userId != '') ||  (userNm != null and userNm != '') || (useYn != null and useYn != '')">
+            AND EXISTS (SELECT 1
+            FROM wcsdb.TB_COM_USER_MST b
+            WHERE 1 = 1
+            AND b.CO_CD = a.CO_CD
+            AND b.USER_LVL = 2
+            <if test="userId != null and userId != '' ">
+                <![CDATA[
+                        AND b.USER_ID LIKE CONCAT('%', #{userId}, '%')
+                        ]]>
+            </if>
+            <if test="userNm != null and userNm != '' ">
+                <![CDATA[
+                        AND b.USER_NM LIKE CONCAT('%', #{userNm}, '%')
+                         ]]>
+            </if>
+            <if test="useYn != null and useYn != '' ">
+                <![CDATA[
+                        AND b.USE_YN = #{useYn}
+                        ]]>
+            </if>
+
+            )
+        </if>
+        ;
+    </select>
+
+    <select id="getTenantForUserTotalCnt"
+            parameterType="com.lgcns.smartwcs.tenant.model.TenantSearchCondition"
+            resultType="java.lang.Integer">
+        <![CDATA[
+        /* SELECT getTenantForUserTotalCnt */
+        SELECT COUNT(*) AS totalCnt
+        FROM wcsdb.TB_COM_TENANT_MST a
+        WHERE 1 = 1
+          AND a.USE_YN = 'Y'
+          AND a.CO_CD <> 'LGWCS'
+          ]]>
+        <if test="coCd != null and coCd != '' ">
+            <![CDATA[
+          AND a.CO_CD LIKE CONCAT('%', #{coCd}, '%')
+          ]]>
+        </if>
+        <if test="coNm != null and coNm != '' ">
+            <![CDATA[
+          AND a.CO_NM LIKE CONCAT('%', #{coNm}, '%')
+          ]]>
+        </if>
+        <if test="(userId != null and userId != '') ||  (userNm != null and userNm != '') || (useYn != null and useYn != '')">
+            AND EXISTS (SELECT 1
+            FROM wcsdb.TB_COM_USER_MST b
+            WHERE 1 = 1
+            AND b.CO_CD = a.CO_CD
+            AND b.USER_LVL = 2
+            <if test="userId != null and userId != '' ">
+                <![CDATA[
+                        AND b.USER_ID LIKE CONCAT('%', #{userId}, '%')
+                        ]]>
+            </if>
+            <if test="userNm != null and userNm != '' ">
+                <![CDATA[
+                        AND b.USER_NM LIKE CONCAT('%', #{userNm}, '%')
+                         ]]>
+            </if>
+            <if test="useYn != null and useYn != '' ">
+                <![CDATA[
+                        AND b.USE_YN = #{useYn}
+                        ]]>
+            </if>
+
+            )
+        </if>
+        ;
+    </select>
+
+    <select id="getTenantforMenuList"
+            parameterType="com.lgcns.smartwcs.tenant.model.TenantSearchCondition"
+            resultType="com.lgcns.smartwcs.tenant.model.Tenant">
+        <![CDATA[
+        /* SELECT getTenantforMenuList */
+        SELECT CO_CD
+              ,CO_NM
+        FROM wcsdb.TB_COM_TENANT_MST a
+        WHERE 1 = 1
+          AND a.USE_YN = 'Y'
+          AND a.CO_CD <> 'LGWCS'
+          ]]>
+        <if test="coCd != null and coCd != '' ">
+            <![CDATA[
+          AND a.CO_CD LIKE CONCAT('%', #{coCd}, '%')
+          ]]>
+        </if>
+        <if test="coNm != null and coNm != '' ">
+            <![CDATA[
+          AND a.CO_NM LIKE CONCAT('%', #{coNm}, '%')
+          ]]>
+        </if>
+        <if test="useYn != null and useYn != ''">
+            AND EXISTS (SELECT 1
+            FROM wcsdb.TB_COM_TENANT_MENU_MPNG b
+            WHERE 1 = 1
+            AND b.CO_CD = a.CO_CD
+            <if test="useYn != null and useYn != '' ">
+                <![CDATA[
+			                AND b.USE_YN = #{useYn}
+			                     ]]>
+            </if>
+            )
+        </if>
+        <if test="size != null and page != null ">
+            LIMIT #{size} OFFSET #{page}
+        </if>
+        ;
+    </select>
+
+    <select id="getTenantforMenuTotalCnt" parameterType="com.lgcns.smartwcs.tenant.model.TenantSearchCondition"
+            resultType="java.lang.Integer">
+        <![CDATA[
+        /* SELECT getTenantforMenuTotalCnt */
+        SELECT COUNT(*) AS totalCnt
+        FROM wcsdb.TB_COM_TENANT_MST a
+        WHERE 1 = 1
+        AND a.USE_YN = 'Y'
+        AND a.CO_CD <> 'LGWCS'
+        ]]>
+        <if test="coCd != null and coCd != '' ">
+            <![CDATA[
+          AND a.CO_CD LIKE CONCAT('%', #{coCd}, '%')
+          ]]>
+        </if>
+        <if test="coNm != null and coNm != '' ">
+            <![CDATA[
+          AND a.CO_NM LIKE CONCAT('%', #{coNm}, '%')
+          ]]>
+        </if>
+        <if test="useYn != null and useYn != ''">
+            AND EXISTS (SELECT 1
+            FROM wcsdb.TB_COM_TENANT_MENU_MPNG b
+            WHERE 1 = 1
+            AND b.CO_CD = a.CO_CD
+            <if test="useYn != null and useYn != '' ">
+                <![CDATA[
+			                        AND b.USE_YN = #{useYn}
+			                        ]]>
+            </if>
+            )
+        </if>
+        ;
+    </select>
+
+
+</mapper>

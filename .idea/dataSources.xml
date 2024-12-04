@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
+    <data-source source="LOCAL" name="wcsdb@10.1.131.31" uuid="8c11412d-c6bf-4958-a9df-20a52140d52b">
+      <driver-ref>mysql.8</driver-ref>
+      <synchronize>true</synchronize>
+      <imported>true</imported>
+      <remarks>$PROJECT_DIR$/raas-apigateway-service/src/main/resources/application.yml</remarks>
+      <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
+      <jdbc-url>jdbc:mysql://10.1.131.31:3306/wcsdb?characterEncoding=UTF-8&amp;serverTimezone=Asia/Seoul&amp;allowMultiQueries=true</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
+    <data-source source="LOCAL" name="wcsdb@35.216.17.109" uuid="1c00650d-331f-45f5-a799-10418aee31f9">
+      <driver-ref>mysql.8</driver-ref>
+      <synchronize>true</synchronize>
+      <imported>true</imported>
+      <remarks>$PROJECT_DIR$/raas-backend-template/src/main/resources/application.yml</remarks>
+      <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
+      <jdbc-url>jdbc:mysql://35.216.17.109:3306/wcsdb?characterEncoding=UTF-8&amp;serverTimezone=Asia/Seoul&amp;allowMultiQueries=true</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
+    <data-source source="LOCAL" name="wcsdb@10.1.131.232" uuid="f0be8110-de49-49d4-be2a-fde625b0ffdc">
+      <driver-ref>mysql.8</driver-ref>
+      <synchronize>true</synchronize>
+      <imported>true</imported>
+      <remarks>$PROJECT_DIR$/raas-apigateway-service/src/main/resources/application.yml</remarks>
+      <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
+      <jdbc-url>jdbc:mysql://10.1.131.232:3306/wcsdb?characterEncoding=UTF-8&amp;serverTimezone=Asia/Seoul&amp;allowMultiQueries=true</jdbc-url>
+      <jdbc-additional-properties>
+        <property name="com.intellij.clouds.kubernetes.db.host.port" />
+        <property name="com.intellij.clouds.kubernetes.db.enabled" value="false" />
+        <property name="com.intellij.clouds.kubernetes.db.container.port" />
+      </jdbc-additional-properties>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
+    <data-source source="LOCAL" name="wcsdb@10.1.131.235" uuid="e468fb99-86be-475c-8c86-76dec384d67c">
+      <driver-ref>mysql.8</driver-ref>
+      <synchronize>true</synchronize>
+      <imported>true</imported>
+      <remarks>$PROJECT_DIR$/raas-common-service/src/main/resources/application.yml</remarks>
+      <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
+      <jdbc-url>jdbc:mysql://10.1.131.235:3306/wcsdb?characterEncoding=UTF-8&amp;serverTimezone=Asia/Seoul&amp;allowMultiQueries=true</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
+    <data-source source="LOCAL" name="wcsdb@10.1.131.232" uuid="d9b5d85f-5c43-42fd-b87b-21622bf1177f">
+      <driver-ref>mysql.8</driver-ref>
+      <synchronize>true</synchronize>
+      <imported>true</imported>
+      <remarks>$PROJECT_DIR$/raas-common-service/src/main/resources/application.yml</remarks>
+      <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
+      <jdbc-url>jdbc:mysql://10.1.131.232:3306/wcsdb?characterEncoding=UTF-8&amp;serverTimezone=Asia/Seoul&amp;allowMultiQueries=true</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
+    <data-source source="LOCAL" name="palletizer2@localhost" uuid="b56b84c1-d8d9-4063-97d5-81effccaee25">
+      <driver-ref>mysql.8</driver-ref>
+      <synchronize>true</synchronize>
+      <imported>true</imported>
+      <remarks>$PROJECT_DIR$/raas-common-service/src/main/resources/application.yml</remarks>
+      <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
+      <jdbc-url>jdbc:mysql://localhost:3306/palletizer2?characterEncoding=UTF-8&amp;serverTimezone=Asia/Seoul&amp;allowMultiQueries=true</jdbc-url>
+      <jdbc-additional-properties>
+        <property name="com.intellij.clouds.kubernetes.db.host.port" />
+        <property name="com.intellij.clouds.kubernetes.db.enabled" value="false" />
+        <property name="com.intellij.clouds.kubernetes.db.resource.type" value="Deployment" />
+        <property name="com.intellij.clouds.kubernetes.db.container.port" />
+      </jdbc-additional-properties>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
+    <data-source source="LOCAL" name="wcsdb@10.1.131.235" uuid="47096cc0-5aa8-49f8-b2ef-2b6a2912bd4f">
+      <driver-ref>mysql.8</driver-ref>
+      <synchronize>true</synchronize>
+      <imported>true</imported>
+      <remarks>$PROJECT_DIR$/raas-backend-template/src/main/resources/application.yml</remarks>
+      <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
+      <jdbc-url>jdbc:mysql://10.1.131.235:3306/wcsdb?characterEncoding=UTF-8&amp;serverTimezone=Asia/Seoul&amp;allowMultiQueries=true</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
+    <data-source source="LOCAL" name="wcsdb@10.1.188.94" uuid="8436db47-5c66-410e-8826-84c79c830875">
+      <driver-ref>mysql.8</driver-ref>
+      <synchronize>true</synchronize>
+      <imported>true</imported>
+      <remarks>$PROJECT_DIR$/raas-common-service/src/main/resources/application.yml</remarks>
+      <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
+      <jdbc-url>jdbc:mysql://10.1.188.94:3306/wcsdb?characterEncoding=UTF-8&amp;serverTimezone=Asia/Seoul&amp;allowMultiQueries=true</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
+    <data-source source="LOCAL" name="wcsdb@10.1.131.232" uuid="995a0446-185f-4973-9e8a-b60c8501ca89">
+      <driver-ref>mysql.8</driver-ref>
+      <synchronize>true</synchronize>
+      <imported>true</imported>
+      <remarks>$PROJECT_DIR$/raas-backend-template/src/main/resources/application.yml</remarks>
+      <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
+      <jdbc-url>jdbc:mysql://10.1.131.232:3306/wcsdb?characterEncoding=UTF-8&amp;serverTimezone=Asia/Seoul&amp;allowMultiQueries=true</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
+    <data-source source="LOCAL" name="wcsdb@10.1.131.235" uuid="5f07896d-5920-4013-bbb5-8449cc74b06d">
+      <driver-ref>mysql.8</driver-ref>
+      <synchronize>true</synchronize>
+      <imported>true</imported>
+      <remarks>$PROJECT_DIR$/raas-apigateway-service/src/main/resources/application.yml</remarks>
+      <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
+      <jdbc-url>jdbc:mysql://10.1.131.235:3306/wcsdb?characterEncoding=UTF-8&amp;serverTimezone=Asia/Seoul&amp;allowMultiQueries=true</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
+    <data-source source="LOCAL" name="wcsdb@10.1.188.94" uuid="f47aad42-f2db-428d-a435-d3c0ef81c666">
+      <driver-ref>mysql.8</driver-ref>
+      <synchronize>true</synchronize>
+      <imported>true</imported>
+      <remarks>$PROJECT_DIR$/raas-apigateway-service/src/main/resources/application.yml</remarks>
+      <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
+      <jdbc-url>jdbc:mysql://10.1.188.94:3306/wcsdb?characterEncoding=UTF-8&amp;serverTimezone=Asia/Seoul&amp;allowMultiQueries=true</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
+    <data-source source="LOCAL" name="wcsdb@localhost" uuid="a19b1fa3-35aa-48fc-b398-208798f6022b">
+      <driver-ref>mysql.8</driver-ref>
+      <synchronize>true</synchronize>
+      <imported>true</imported>
+      <remarks>$PROJECT_DIR$/raas-backend-template/src/main/resources/application.yml</remarks>
+      <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
+      <jdbc-url>jdbc:sqlserver://localhost:1433;databaseName=wcsdb</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
+    <data-source source="LOCAL" name="wcsdb@10.1.131.31" uuid="935c422e-2f3e-469d-9c3b-66bac3386592">
+      <driver-ref>mysql.8</driver-ref>
+      <synchronize>true</synchronize>
+      <imported>true</imported>
+      <remarks>$PROJECT_DIR$/raas-backend-template/src/main/resources/application.yml</remarks>
+      <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
+      <jdbc-url>jdbc:mysql://10.1.131.31:3306/wcsdb?characterEncoding=UTF-8&amp;serverTimezone=Asia/Seoul&amp;allowMultiQueries=true</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
+    <data-source source="LOCAL" name="wcsdb@10.1.131.31" uuid="faec64c3-4d1f-4ae1-a939-49c9ae0a4e28">
+      <driver-ref>mysql.8</driver-ref>
+      <synchronize>true</synchronize>
+      <imported>true</imported>
+      <remarks>$PROJECT_DIR$/raas-common-service/src/main/resources/application.yml</remarks>
+      <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
+      <jdbc-url>jdbc:mysql://10.1.131.31:3306/wcsdb?characterEncoding=UTF-8&amp;serverTimezone=Asia/Seoul&amp;allowMultiQueries=true</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
+    <data-source source="LOCAL" name="wcsdb@10.1.188.94" uuid="027406ec-2604-44d2-ab71-fa8dc507bc4d">
+      <driver-ref>mysql.8</driver-ref>
+      <synchronize>true</synchronize>
+      <imported>true</imported>
+      <remarks>$PROJECT_DIR$/raas-backend-template/src/main/resources/application.yml</remarks>
+      <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
+      <jdbc-url>jdbc:mysql://10.1.188.94:3306/wcsdb?characterEncoding=UTF-8&amp;serverTimezone=Asia/Seoul&amp;allowMultiQueries=true</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
+    <data-source source="LOCAL" name="palletizer@localhost" uuid="010419f4-bcfb-435c-89b5-57bcf668856f">
+      <driver-ref>mysql.8</driver-ref>
+      <synchronize>true</synchronize>
+      <imported>true</imported>
+      <remarks>$PROJECT_DIR$/raas-common-service/src/main/resources/application.yml</remarks>
+      <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
+      <jdbc-url>jdbc:mysql://localhost:3306/palletizer?characterEncoding=UTF-8&amp;serverTimezone=Asia/Seoul&amp;allowMultiQueries=true</jdbc-url>
+      <jdbc-additional-properties>
+        <property name="com.intellij.clouds.kubernetes.db.host.port" />
+        <property name="com.intellij.clouds.kubernetes.db.enabled" value="false" />
+        <property name="com.intellij.clouds.kubernetes.db.container.port" />
+      </jdbc-additional-properties>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
+  </component>
+</project>

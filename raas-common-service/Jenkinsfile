@@ -1,0 +1,274 @@
+def getJavaProfile() {
+    if(BRANCH_NAME == 'dev') {
+        return 'dev'
+    } else if(BRANCH_NAME == 'stage') {
+        return 'stage'
+    } else if(BRANCH_NAME == 'master') {
+     return 'prod'
+    }
+}
+
+//Sonar는 DEV만 적용
+def SONAR_HOST_URL = 'http://10.1.102.70:7100'
+def SONAR_PROJECT_KEY = 'reds_lgcom'
+def SONAR_AUTH_TOKEN = '195ed72c04ea79b5449cec7d982acc9488ec163a'
+def SONAR_SOURCE = 'src/main/java'
+
+pipeline {
+    agent {
+    kubernetes {
+        inheritFrom 'raas-build-jdk17'
+        defaultContainer 'main'
+    }
+}
+
+    environment {
+        JAVA_PROFILE = getJavaProfile()
+        CI_COMMIT_SHORT_SHA = ""
+    }
+
+    options {
+        ansiColor('xterm')
+        timestamps()
+        timeout(time: 24, unit: 'HOURS')
+        disableConcurrentBuilds()
+        buildDiscarder(logRotator(numToKeepStr: '5', artifactNumToKeepStr: '5'))
+    }
+
+    stages {    
+
+        stage("Gradlew Build") {
+			when { 
+				anyOf {
+                    branch 'dev'
+					branch 'stage'
+					branch 'master'
+                }
+			}
+            steps {
+				container('main'){
+					script {
+						sh "pwd"
+						sh "ls -al"
+						sh "java -version"
+						echo "JAVA_PROFILE = ${JAVA_PROFILE}."
+						echo "BRANCH_NAME = ${BRANCH_NAME}."
+						sh 'chmod +x gradlew'
+						sh "./gradlew clean build -x test"	
+						sh "ls -al"
+						sh "ls -al ./build"			
+						sh "ls -al ./build/libs"					
+						sh "ls -al ./build/classes/java/main"		
+						sh "ls -al ./src/main/java"
+					}
+				}
+            }
+		}
+		
+		stage("SonarQube Quality Gate") {
+			when { branch 'dev' }
+            steps {
+				script {
+					try {
+						container('main'){
+							script {					
+								sh 'chmod +x gradlew'
+								sh "./gradlew sonarqube \
+										-Dsonar.projectKey=raas-backend\
+										-Dsonar.host.url=http://10.2.115.3:9000 \
+										-Dsonar.login=076f25d48ba6b5a3cc651900013f389d48b8968d"										
+							}
+						}
+					}catch (e) {
+						sh 'echo SonarQube Quality Gate Fail!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
+					} 
+				}
+            }
+		}
+			
+		
+				
+		
+        stage("Deploy dev") {
+            when { branch 'dev'	}
+			steps([$class: 'BapSshPromotionPublisherPlugin']) {				
+				container('main'){					
+					sshPublisher(
+						continueOnError: false, 
+						failOnError: true,
+						publishers: [
+								sshPublisherDesc(
+									 configName: "RAAS_WCS_DEV1",              //Jenkins에 등록한 서버명
+									 verbose: true,
+									transfers: [
+										sshTransfer(		
+												execCommand: "pwd;ls -al backend/common-service;cp -rf backend/common-service/RaaSCommonSerivce-0.0.1-SNAPSHOT.jar backend/common-service/backup"       //1. backup 폴더에 파일을 복사함   
+											),									
+										sshTransfer(									   //2. 파일을 전송하고 pm2를 다시 실행함		
+												sourceFiles: "build/libs/RaaSCommonSerivce-0.0.1-SNAPSHOT.jar",       //전송할 파일은 대체 어디 경로에서 가져오는가?
+												removePrefix: "build/libs",                       //보내고자 하는 타겟 파일만 보내기 위해
+												remoteDirectory: "backend/common-service",  //파일을 전송할 원격지 경로  
+												execCommand: "pm2 stop common-service; pm2 start backend/common-service/app.json"       //원격지에서 실행할 커맨드  pm2 stop 후 pm2 start 
+											),
+										sshTransfer(		
+													execCommand: "backend/common-service/back-check.py"    //Health Check Logic 추가
+												)
+										]
+								)
+							 ]
+					)
+				}
+            }
+            
+		}
+		
+		stage("Deploy stage") {
+            when { branch 'stage' }
+			steps([$class: 'BapSshPromotionPublisherPlugin']) {
+				container('main'){
+					sshPublisher(
+						continueOnError: false, 
+						failOnError: true,
+						publishers: [
+								sshPublisherDesc(
+									 configName: "RAAS_WCS_STG1",              //Jenkins에 등록한 서버명
+									 verbose: true,
+									transfers: [
+										sshTransfer(		
+												execCommand: "pwd;ls -al backend/common-service;cp -rf backend/common-service/RaaSCommonSerivce-0.0.1-SNAPSHOT.jar backend/common-service/backup"       //1. backup 폴더에 파일을 복사함   
+											),									
+										sshTransfer(									   //2. 파일을 전송하고 pm2를 다시 실행함		
+												sourceFiles: "build/libs/RaaSCommonSerivce-0.0.1-SNAPSHOT.jar",       //전송할 파일은 대체 어디 경로에서 가져오는가?
+												removePrefix: "build/libs",                       //보내고자 하는 타겟 파일만 보내기 위해
+												remoteDirectory: "backend/common-service",  //파일을 전송할 원격지 경로  
+												execCommand: "pm2 stop common-service; pm2 start backend/common-service/app.json"       //원격지에서 실행할 커맨드  pm2 stop 후 pm2 start 
+											),
+										sshTransfer(		
+													execCommand: "backend/common-service/back-check.py"    //Health Check Logic 추가
+												)
+										]
+								)
+							 ]
+					)
+				}	
+            }
+            
+		}
+		
+		stage("Deploy master1") {
+            when { branch 'master' }
+			steps([$class: 'BapSshPromotionPublisherPlugin']) {
+				container('main'){
+					sshPublisher(
+						continueOnError: false, 
+						failOnError: true,
+						publishers: [
+								sshPublisherDesc(
+									 configName: "RAAS_WCS_PRD-VM-1",              //Jenkins에 등록한 서버명
+									 verbose: true,
+									transfers: [
+										sshTransfer(		
+												execCommand: "pwd;ls -al backend/common-service;cp -rf backend/common-service/RaaSCommonSerivce-0.0.1-SNAPSHOT.jar backend/common-service/backup"       //1. backup 폴더에 파일을 복사함   
+											),									
+										sshTransfer(									   //2. 파일을 전송하고 pm2를 다시 실행함		
+												sourceFiles: "build/libs/RaaSCommonSerivce-0.0.1-SNAPSHOT.jar",       //전송할 파일은 대체 어디 경로에서 가져오는가?
+												removePrefix: "build/libs",                       //보내고자 하는 타겟 파일만 보내기 위해
+												remoteDirectory: "backend/common-service",  //파일을 전송할 원격지 경로  
+												execCommand: "pm2 stop common-service; pm2 start backend/common-service/app.json"       //원격지에서 실행할 커맨드  pm2 stop 후 pm2 start  
+											),
+										sshTransfer(		
+													execCommand: "backend/common-service/back-check.py"    //Health Check Logic 추가
+												)
+										]
+								)
+							 ]
+					)
+				}	
+            }
+            
+		}
+		
+		stage("Deploy master2") {
+            when { branch 'master' }
+			steps([$class: 'BapSshPromotionPublisherPlugin']) {
+				container('main'){
+					sshPublisher(
+						continueOnError: false, 
+						failOnError: true,
+						publishers: [
+								sshPublisherDesc(
+									 configName: "RAAS_WCS_PRD-VM-2",              //Jenkins에 등록한 서버명
+									 verbose: true,
+									transfers: [
+										sshTransfer(		
+												execCommand: "pwd;ls -al backend/common-service;cp -rf backend/common-service/RaaSCommonSerivce-0.0.1-SNAPSHOT.jar backend/common-service/backup"       //1. backup 폴더에 파일을 복사함   
+											),									
+										sshTransfer(									   //2. 파일을 전송하고 pm2를 다시 실행함		
+												sourceFiles: "build/libs/RaaSCommonSerivce-0.0.1-SNAPSHOT.jar",       //전송할 파일은 대체 어디 경로에서 가져오는가?
+												removePrefix: "build/libs",                       //보내고자 하는 타겟 파일만 보내기 위해
+												remoteDirectory: "backend/common-service",  //파일을 전송할 원격지 경로  
+												execCommand: "pm2 stop common-service; pm2 start backend/common-service/app.json"       //원격지에서 실행할 커맨드  pm2 stop 후 pm2 start  
+											),
+										sshTransfer(		
+													execCommand: "backend/common-service/back-check.py"    //Health Check Logic 추가
+												)
+										]
+								)
+							 ]
+					)
+				}	
+            }
+            
+		}
+		
+		stage("uCoverage dev") {
+            when { branch 'dev' }
+			steps([$class: 'BapSshPromotionPublisherPlugin']) {
+				container('main'){
+					sshPublisher(
+						continueOnError: false, 
+						failOnError: true,
+						publishers: [
+								sshPublisherDesc(
+									 configName: "RAAS_WCS_UCOVERAGE-1",              //Jenkins에 등록한 서버명
+									 verbose: true,
+									transfers: [		
+                                        sshTransfer(		
+												execCommand: "rm -rf uCoverage/data/classes;mkdir uCoverage/data/classes"       //1. classes 폴더를 삭제하고 다시 만듦   
+											),	
+										sshTransfer(		
+												execCommand: "rm -rf uCoverage/data/src;mkdir uCoverage/data/src"       //1. src 폴더를 삭제하고 다시 만듦   
+											),	
+										sshTransfer(									   	
+												sourceFiles: "build/classes/java/main/**",       //전송할 파일은 대체 어디 경로에서 가져오는가?
+												removePrefix: "build/classes/java/main",                       //보내고자 하는 타겟 파일만 보내기 위해
+												remoteDirectory: "uCoverage/data/classes"  //파일을 전송할 원격지 경로  
+											   
+											),	
+										sshTransfer(									   
+												sourceFiles: "src/main/java/**",       //전송할 파일은 대체 어디 경로에서 가져오는가?
+												removePrefix: "src/main/java",                       //보내고자 하는 타겟 파일만 보내기 위해
+												remoteDirectory: "uCoverage/data/src"  //파일을 전송할 원격지 경로  
+											   
+											)									
+										]
+								)
+							 ]
+					)
+				}	
+            }
+            
+		}	
+		
+    }
+	
+	post {
+		always {
+			build job: "jenkins-log/pipeline-log-collector", parameters: [string(name: 'JobUrl', value: env.BUILD_URL)], wait: false
+		}
+	}
+}
+
+void print(message) {
+    echo "${message}"
+}

@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lgcns.smartwcs.dash_board.repository.WorkloadMapper">
+
+    <select id="getInbdWorkload"
+            parameterType="com.lgcns.smartwcs.dash_board.model.Workload"
+            resultType="java.lang.Integer">
+        <![CDATA[
+        /* SELECT getInbdWorkload */
+        SELECT COUNT(*) AS INBD_CNT
+        FROM wcsdb.TB_WCS_INBD_MST a JOIN wcsdb.TB_WCS_INBD_DTL b
+                                          ON a.CO_CD = b.CO_CD
+                                              AND a.CNTR_CD = b.CNTR_CD
+                                              AND a.EQP_ID = b.EQP_ID
+                                              AND a.INBD_UID_KEY = b.INBD_UID_KEY
+        WHERE 1 = 1
+          AND a.CO_CD = #{coCd}
+          AND a.CNTR_CD = #{cntrCd}
+          AND a.EQP_ID = #{eqpId}
+          AND b.INBD_CMPT_YN = 'N'
+          AND b.INBD_CNCL_YN = 'N'
+         ]]>
+        <if test="searchStartDt != null and searchStartDt != '' ">
+            <![CDATA[
+              AND a.INBD_EXPECT_DT >= #{searchStartDt}
+            ]]>
+        </if>
+        <if test="searchEndDt != null and searchEndDt != '' ">
+            <![CDATA[
+                  AND a.INBD_EXPECT_DT <= #{searchEndDt}
+                ]]>
+        </if>
+        ORDER BY b.EXTERN_INBD_NO, b.EXTERN_INBD_SUB_NO
+        ;
+
+    </select>
+
+    <select id="getObndWorkload"
+            parameterType="com.lgcns.smartwcs.dash_board.model.Workload"
+            resultType="java.lang.Integer">
+        <![CDATA[
+        /* SELECT getObndWorkload */
+        SELECT COUNT(*) AS OBNDD_CNT
+   FROM (SELECT a.OBND_UID_KEY AS OBND_UID_KEY
+        FROM wcsdb.TB_WCS_OBND_MST a JOIN wcsdb.TB_WCS_OBND_DTL b
+                                          ON (a.CO_CD = b.CO_CD
+                                              AND a.CNTR_CD = b.CNTR_CD
+                                              AND a.EQP_ID = b.EQP_ID
+                                              AND a.OBND_UID_KEY = b.OBND_UID_KEY
+                                              AND b.OBND_CNCL_YN = 'N'
+                                              )
+        WHERE 1 = 1
+        ]]>
+        AND a.CO_CD = #{coCd}
+        AND a.CNTR_CD = #{cntrCd}
+        AND a.EQP_ID = #{eqpId}
+        <if test="searchStartDt != null and searchStartDt != '' ">
+            <![CDATA[
+          AND a.OBND_EXPECT_DT >= #{searchStartDt}
+          ]]>
+        </if>
+        <if test="searchEndDt != null and searchEndDt != '' ">
+            <![CDATA[
+          AND a.OBND_EXPECT_DT <= #{searchEndDt}
+        ]]>
+        </if>
+        <![CDATA[
+        GROUP BY   a.OBND_UID_KEY
+        HAVING SUM(b.QTY_OBND_ORD) > SUM(b.QTY_OBND_CMPT) + SUM(b.QTY_OBND_EXCEPT)
+       ]]>
+        ) d
+        ;
+    </select>
+
+    <select id="getSttkWorkload"
+            parameterType="com.lgcns.smartwcs.dash_board.model.Workload"
+            resultType="java.lang.Integer">
+        <![CDATA[
+        /* SELECT getSttkWorkload */
+         SELECT COUNT(d.STTK_UID_KEY)
+   FROM (SELECT  a.STTK_UID_KEY AS STTK_UID_KEY
+                  , SUM(1) AS DTL_ROW_CNT
+                  , SUM(CASE WHEN b.STTK_STATUS_CD = '90' THEN 1
+                             ELSE 0 END) AS DTL_CMPT_CNT
+              FROM wcsdb.TB_WCS_STTK_MST a JOIN wcsdb.TB_WCS_STTK_DTL b
+                                             ON (a.CO_CD = b.CO_CD
+                                                   AND a.CNTR_CD = b.CNTR_CD
+                                                   AND a.EQP_ID = b.EQP_ID
+                                                   AND a.STTK_UID_KEY  = b.STTK_UID_KEY)
+            WHERE 1 = 1
+        ]]>
+        AND a.CO_CD = #{coCd}
+        AND a.CNTR_CD = #{cntrCd}
+        AND a.EQP_ID = #{eqpId}
+        AND a.STTK_CNCL_YN = 'N'
+        <if test="searchStartDt != null and searchStartDt != '' ">
+            <![CDATA[
+          AND a.STTK_EXPECT_DT >= #{searchStartDt}
+          ]]>
+        </if>
+        <if test="searchEndDt != null and searchEndDt != '' ">
+            <![CDATA[
+          AND a.STTK_EXPECT_DT <= #{searchEndDt}
+        ]]>
+        </if>
+        <![CDATA[
+        GROUP BY a.STTK_UID_KEY
+        HAVING DTL_ROW_CNT <> DTL_CMPT_CNT
+        ) d
+        ]]>
+        ;
+    </select>
+</mapper>

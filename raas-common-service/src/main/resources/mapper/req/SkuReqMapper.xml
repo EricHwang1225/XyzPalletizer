@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lgcns.smartwcs.req.sku.repository.SkuReqMapper">
+
+    <select id="getSkuReqList"
+            parameterType="com.lgcns.smartwcs.req.sku.model.SkuReqDTO"
+            resultType="com.lgcns.smartwcs.req.sku.model.SkuReqDTO">
+        /* SELECT getSkuReqList */
+        SELECT a.CO_CD,
+        a.CST_CD,
+        a.SKU_CD,
+        a.BCD_NO,
+        a.SKU_NM,
+        a.IMAGE_URL,
+        a.SKU_STACK_METHOD,
+        a.USE_YN,
+        a.BCD_TYPE,
+        a.BCD_USE_YN,
+        a.IF_WCS_YN,
+        a.IF_WCS_STATUS_CD,
+        a.IF_WCS_CNT,
+        a.IF_WCS_DT,
+        a.IF_WCS_MSG,
+        a.WMS_TRACKING_ID,
+        a.WCS_REG_YN,
+        a.REG_DT
+        FROM TB_REQ_SKU_MST a
+        <trim prefix="WHERE" prefixOverrides="AND">
+            <if test="coCd != null and coCd != ''">
+                AND a.CO_CD = #{coCd}
+            </if>
+            <if test="cstCd != null and cstCd != ''">
+                AND a.CST_CD = #{cstCd}
+            </if>
+            <if test="skuCd != null and skuCd != ''">
+                AND a.SKU_CD LIKE CONCAT('%', #{skuCd},'%')
+            </if>
+            <if test="bcdNo != null and bcdNo != ''">
+                AND a.BCD_NO LIKE CONCAT('%', #{bcdNo},'%')
+            </if>
+            <if test="skuNm != null and skuNm != ''">
+                AND a.SKU_NM LIKE CONCAT('%', #{skuNm},'%')
+            </if>
+            <if test="useYn != null and useYn != ''">
+                AND a.USE_YN = #{useYn}
+            </if>
+            <if test="bcdUseYn != null and bcdUseYn != ''">
+                AND a.BCD_USE_YN = #{bcdUseYn}
+            </if>
+        </trim>
+    </select>
+
+    <select id="getSkuReqMaster"
+            parameterType="com.lgcns.smartwcs.req.sku.model.SkuReqDTO"
+            resultType="com.lgcns.smartwcs.req.sku.model.SkuReqMaster">
+        /* SELECT getSkuReqMaster */
+        SELECT a.CO_CD,
+        a.CST_CD,
+        a.SKU_CD ,
+        a.SKU_NM ,
+        a.IMAGE_URL,
+        a.SKU_STACK_METHOD,
+        a.USE_YN,
+        MAX(a.REG_ID) AS regId,
+        DATE_FORMAT(MAX(a.REG_DT), '%Y%m%d%H%i%s') AS regDt
+        FROM TB_REQ_SKU_MST a
+        <trim prefix="WHERE" prefixOverrides="AND">
+            <if test="coCd != null and coCd != ''">
+                AND a.CO_CD = #{coCd}
+            </if>
+            <if test="ifWcsYn != null and ifWcsYn != ''">
+                AND a.IF_WCS_YN = #{ifWcsYn}
+            </if>
+        </trim>
+        GROUP BY a.CO_CD,
+        a.CST_CD,
+        a.SKU_CD ,
+        a.SKU_NM ,
+        a.IMAGE_URL,
+        a.SKU_STACK_METHOD,
+        a.USE_YN
+    </select>
+
+    <select id="getSkuReqBcdMaster"
+            parameterType="com.lgcns.smartwcs.req.sku.model.SkuReqMaster"
+            resultType="com.lgcns.smartwcs.req.sku.model.SkuReqBcdMaster">
+        /* SELECT getSkuReqBcdMaster */
+        SELECT a.BCD_NO AS bcd,
+        a.BCD_TYPE,
+        a.BCD_USE_YN AS useYn
+        FROM TB_REQ_SKU_MST a
+        <trim prefix="WHERE" prefixOverrides="AND">
+            <if test="coCd != null and coCd != ''">
+                AND a.CO_CD = #{coCd}
+            </if>
+            <if test="cstCd != null and cstCd != ''">
+                AND a.CST_CD = #{cstCd}
+            </if>
+            <if test="skuCd != null and skuCd != ''">
+                AND a.SKU_CD = #{skuCd}
+            </if>
+        </trim>
+    </select>
+
+    <update id="updateWcsSendSkuMaster"
+            parameterType="com.lgcns.smartwcs.req.sku.model.SkuReqDTO">
+        /* SELECT updateWcsSendSkuMaster */
+        UPDATE TB_REQ_SKU_MST
+        SET IF_WCS_YN = #{ifWcsYn}
+        , IF_WCS_STATUS_CD = #{ifWcsStatusCd}
+        <choose>
+            <when test='ifWcsYn == "Y" '>
+                , IF_WCS_CNT = 1
+            </when>
+            <otherwise>
+                , IF_WCS_CNT = IF_WCS_CNT + #{ifWcsCnt}
+            </otherwise>
+        </choose>
+        , IF_WCS_DT = NOW()
+        , IF_WCS_MSG = #{ifWcsMsg}
+        , WMS_TRACKING_ID = #{wmsTrackingId}
+        <if test='ifWcsYn == "Y" '>
+            ,WCS_REG_YN = 'Y'
+        </if>
+        WHERE 1 = 1
+        AND CO_CD = #{coCd}
+        AND CST_CD = #{cstCd}
+        AND SKU_CD = #{skuCd}
+    </update>
+</mapper>

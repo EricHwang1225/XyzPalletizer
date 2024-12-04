@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lgcns.smartwcs.user.repository.UserMapper">
+
+    <select id="getUserTotalCnt"
+            parameterType="com.lgcns.smartwcs.user.model.UserSearchCondition"
+            resultType="java.lang.Integer">
+        /* SELECT getUserTotalCnt */
+        SELECT COUNT(*) AS totalCnt
+        FROM wcsdb.TB_COM_USER_MST U
+        <if test="coCd != null and coCd != '' ">
+            WHERE U.CO_CD = #{coCd}
+        </if>
+        <if test="cntrCd != null and cntrCd != '' ">
+            AND U.CNTR_CD = #{cntrCd}
+        </if>
+        <if test="userId != null and userId != '' ">
+            AND U.USER_ID LIKE CONCAT('%', #{userId}, '%')
+        </if>
+        <if test="userNm != null and userNm != '' ">
+            AND U.USER_NM LIKE CONCAT('%', #{userNm}, '%')
+        </if>
+        <if test="useYn != null and useYn != '' ">
+            AND U.USE_YN = #{useYn}
+        </if>
+        <if test="roleNm != null and roleNm != '' ">
+            AND U.ROLE_CD IN (SELECT R.ROLE_CD
+            FROM wcsdb.TB_COM_ROLE_MST R
+            WHERE ROLE_NM LIKE CONCAT('%',#{roleNm},'%')
+            AND R.CO_CD = U.CO_CD
+            AND R.CNTR_CD = U.CNTR_CD)
+        </if>
+        AND U.USER_LVL IN (3, 4)
+    </select>
+
+    <select id="getUserList"
+            parameterType="com.lgcns.smartwcs.user.model.UserSearchCondition"
+            resultType="com.lgcns.smartwcs.user.model.UserDTO">
+        /* SELECT getUserList */
+        SELECT U.CO_CD AS coCd
+        ,U.CNTR_CD AS cntrCd
+        ,U.USER_ID AS userId
+        ,U.USER_NM AS userNm
+        ,U.USER_LVL AS userLvl
+        ,U.ROLE_CD AS roleCd
+        ,U.KIOSK_YN AS kioskYn
+        ,U.PWD_INIT_YN AS pwdInitYn
+        ,U.USER_EQP_ID_MAP AS userEqpIdMap
+        ,U.USE_YN AS useYn
+        ,U.REG_DT AS regDt
+        FROM wcsdb.TB_COM_USER_MST U
+        <if test="coCd != null and coCd != '' ">
+            WHERE U.CO_CD = #{coCd}
+        </if>
+        <if test="cntrCd != null and cntrCd != '' ">
+            AND U.CNTR_CD = #{cntrCd}
+        </if>
+        <if test="userId != null and userId != '' ">
+            AND U.USER_ID LIKE CONCAT('%', #{userId}, '%')
+        </if>
+        <if test="userNm != null and userNm != '' ">
+            AND U.USER_NM LIKE CONCAT('%', #{userNm}, '%')
+        </if>
+        <choose>
+            <when test="userLvl == 4">
+                AND U.USER_LVL IN (3, 4)
+            </when>
+            <otherwise>
+                AND U.USER_LVL = #{userLvl}
+            </otherwise>
+        </choose>
+        <if test="useYn != null and useYn != '' ">
+            AND U.USE_YN = #{useYn}
+        </if>
+        <if test="kioskYn != null and kioskYn != '' ">
+            AND U.KIOSK_YN = #{kioskYn}
+        </if>
+        <if test="roleNm != null and roleNm != '' ">
+            AND U.ROLE_CD IN (SELECT R.ROLE_CD
+            FROM wcsdb.TB_COM_ROLE_MST R
+            WHERE ROLE_NM LIKE CONCAT('%',#{roleNm},'%')
+            AND R.CO_CD = U.CO_CD
+            AND R.CNTR_CD = U.CNTR_CD)
+        </if>
+        <if test="size != null and page != null ">
+            LIMIT #{size} OFFSET #{page}
+        </if>
+    </select>
+
+    <select id="getTenantUserList"
+            parameterType="com.lgcns.smartwcs.user.model.UserSearchCondition"
+            resultType="com.lgcns.smartwcs.common.utils.UnderscoreToCamelHashMap">
+        /* SELECT getTenantUserList */
+        SELECT CO_CD
+        , (SELECT DISTINCT CO_NM FROM wcsdb.TB_COM_TENANT_MST WHERE CO_CD = A.CO_CD) AS CO_NM
+        , USER_ID
+        , USER_NM
+        , PWD_INIT_YN
+        , USE_YN
+        FROM wcsdb.TB_COM_USER_MST A
+        WHERE 1=1
+        <if test="searchCoCd != null and searchCoCd != '' ">
+            AND CO_CD = #{searchCoCd}
+        </if>
+        <if test="coNm != null and coNm != '' ">
+            AND EXISTS (SELECT 1
+            FROM wcsdb.TB_COM_TENANT_MST B
+            WHERE 1=1
+            AND A.CO_CD = CO_CD
+            AND CO_NM LIKE CONCAT('%', #{coNm}, '%'))
+        </if>
+        <if test="userId != null and userId != '' ">
+            AND USER_ID LIKE CONCAT('%', #{userId}, '%')
+        </if>
+        <if test="userNm != null and userNm != '' ">
+            AND USER_NM LIKE CONCAT('%', #{userNm}, '%')
+        </if>
+        <if test="useYn != null and useYn != '' ">
+            AND USE_YN = #{useYn}
+        </if>
+        AND USER_LVL = 2
+    </select>
+
+
+    <select id="getCenterUserList"
+            parameterType="com.lgcns.smartwcs.user.model.UserSearchCondition"
+            resultType="com.lgcns.smartwcs.common.utils.UnderscoreToCamelHashMap">
+        /* SELECT getCenterUserList */
+        SELECT CO_CD
+        , CNTR_CD
+        , (SELECT CNTR_NM FROM wcsdb.TB_COM_CENTER_MST WHERE CO_CD = A.CO_CD AND CNTR_CD = A.CNTR_CD) AS CNTR_NM
+        , USER_ID
+        , USER_NM
+        , PWD_INIT_YN
+        , USE_YN
+        FROM wcsdb.TB_COM_USER_MST A
+        WHERE 1=1
+        <if test="coCd != null and coCd != '' ">
+            AND CO_CD = #{coCd}
+        </if>
+        <if test="searchCntrCd != null and searchCntrCd != '' ">
+            AND CNTR_CD LIKE CONCAT('%', #{searchCntrCd}, '%')
+        </if>
+        <if test="cntrNm != null and cntrNm != '' ">
+            AND EXISTS (SELECT 1
+            FROM wcsdb.TB_COM_CENTER_MST
+            WHERE 1=1
+            AND A.CO_CD = CO_CD
+            AND CNTR_NM LIKE CONCAT('%', #{cntrNm}, '%'))
+        </if>
+        <if test="userId != null and userId != '' ">
+            AND USER_ID LIKE CONCAT('%',#{userId}, '%')
+        </if>
+        <if test="userNm != null and userNm != '' ">
+            AND USER_NM LIKE CONCAT('%', #{userNm}, '%')
+        </if>
+        <if test="useYn != null and useYn != '' ">
+            AND USE_YN = ''
+        </if>
+        AND USER_LVL = 3
+    </select>
+
+    <insert id="saveUserRoleHist" parameterType="com.lgcns.smartwcs.user.model.UserRoleHist">
+        /* MERGE saveUserRoleHist */
+        INSERT INTO wcsdb.TB_LOG_USER_ROLE_HIST
+            (CO_CD, CNTR_CD, USER_ID, REG_DT, USE_YN, PRE_ROLE_CD, ROLE_CD, REG_ID)
+        VALUES (#{coCd}, #{cntrCd}, #{userId}, NOW(), #{useYn}, #{preRoleCd}, #{roleCd}, #{regId});
+    </insert>
+
+</mapper>

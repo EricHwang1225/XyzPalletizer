@@ -1,0 +1,333 @@
+def getJavaProfile() {
+    if(BRANCH_NAME == 'dev') {
+        return 'dev'
+    } else if(BRANCH_NAME == 'stage') {
+        return 'stage'
+    } else if(BRANCH_NAME == 'master') {
+     return 'prod'
+    }
+}
+
+//Sonar는 DEV만 적용
+def SONAR_HOST_URL = 'http://10.1.102.70:7100'
+def SONAR_PROJECT_KEY = 'reds_lgcom'
+def SONAR_AUTH_TOKEN = '195ed72c04ea79b5449cec7d982acc9488ec163a'
+def SONAR_SOURCE = 'src/main/java'
+
+pipeline {
+    agent {
+    kubernetes {
+        inheritFrom 'raas-build'
+        defaultContainer 'main'
+    }
+}
+
+    environment {
+        JAVA_PROFILE = getJavaProfile()
+        CI_COMMIT_SHORT_SHA = ""
+    }
+
+    options {
+        ansiColor('xterm')
+        timestamps()
+        timeout(time: 24, unit: 'HOURS')
+        disableConcurrentBuilds()
+        buildDiscarder(logRotator(numToKeepStr: '5', artifactNumToKeepStr: '5'))
+    }
+
+    stages {    
+
+        stage("Gradlew Build") {
+			when { branch 'dev' }
+            steps {
+				container('main'){
+					script {
+						sh "pwd"
+						sh "ls -al"
+						sh "java -version"
+						echo "JAVA_PROFILE = ${JAVA_PROFILE}."
+						echo "BRANCH_NAME = ${BRANCH_NAME}."
+						sh 'chmod +x gradlew'
+						sh "./gradlew clean build -x test"	
+						sh "ls -al"
+						sh "ls -al ./build"			
+						sh "ls -al ./build/libs"					
+						sh "ls -al ./build/classes/java/main"		
+						sh "ls -al ./src/main/java"
+					}
+				}
+            }
+		}
+		
+		stage("SonarQube Quality Gate") {
+			when { branch 'dev-xxx' }
+            steps {
+				script {
+					try {
+						container('main'){
+							script {					
+								sh 'chmod +x gradlew'
+								sh "./gradlew sonarqube \
+										-Dsonar.projectKey=raas-backend\
+										-Dsonar.host.url=http://10.2.115.3:9000 \
+										-Dsonar.login=076f25d48ba6b5a3cc651900013f389d48b8968d"										
+							}
+						}
+					}catch (e) {
+						sh 'echo SonarQube Quality Gate Fail!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
+					} 
+				}
+            }
+		}
+			
+		
+				
+		
+        stage("Deploy dev") {
+            when { branch 'dev'	}
+			steps([$class: 'BapSshPromotionPublisherPlugin']) {				
+				container('main'){					
+					sshPublisher(
+						continueOnError: false, 
+						failOnError: true,
+						publishers: [
+								sshPublisherDesc(
+									 configName: "RAAS_WCS_DEV1",              //Jenkins에 등록한 서버명
+									 verbose: true,
+									transfers: [
+										sshTransfer(		
+												execCommand: "pwd;ls -al backend;mv backend/SmartWCS-0.0.1-SNAPSHOT.jar backend/backup/SmartWCS-0.0.1-SNAPSHOT.jar"       //1. backup 폴더에 파일을 복사함   
+											),									
+										sshTransfer(									   //2. 파일을 전송하고 pm2를 다시 실행함		
+												sourceFiles: "build/libs/SmartWCS-0.0.1-SNAPSHOT.jar",       //전송할 파일은 대체 어디 경로에서 가져오는가?
+												removePrefix: "build/libs",                       //전송 후 로컬 파일을 삭제할 경우 작성   기존 파일은 안지우고 그냥 바꿔치기 해도 되는가
+												remoteDirectory: "backend",  //파일을 전송할 원격지 경로  
+												execCommand: "pm2 stop raas_be; pm2 start backend/app.json"       //원격지에서 실행할 커맨드  pm2 stop 후 pm2 start 
+											),
+										sshTransfer(		
+													execCommand: "cp -r backend/backup backend/`date +%Y-%m-%d_%H:%M:%S`/"    //날짜별로 폴더를 만들어서 백업  mkdir /raas/backend/`date +%Y-%m-%d_%H:%M:%S`   
+												),
+										sshTransfer(		
+													execCommand: "backend/back-check.py"    //Health Check Logic 추가
+												)
+										]
+								)
+							 ]
+					)
+				}
+            }
+            
+		}
+		
+		stage("Deploy stage") {
+            when { branch 'stage' }
+			steps([$class: 'BapSshPromotionPublisherPlugin']) {
+				container('main'){
+					sshPublisher(
+						continueOnError: false, 
+						failOnError: true,
+						publishers: [
+								sshPublisherDesc(
+									 configName: "RAAS_WCS_STG1",              //Jenkins에 등록한 서버명
+									 verbose: true,
+									transfers: [
+										sshTransfer(		
+												execCommand: "pwd;ls -al backend;mv backend/SmartWCS-0.0.1-SNAPSHOT.jar backend/backup/SmartWCS-0.0.1-SNAPSHOT.jar"       //1. backup 폴더에 파일을 복사함   
+											),									
+										sshTransfer(									   //2. 파일을 전송하고 pm2를 다시 실행함		
+												sourceFiles: "build/libs/SmartWCS-0.0.1-SNAPSHOT.jar",       //전송할 파일은 대체 어디 경로에서 가져오는가?
+												removePrefix: "build/libs",                       //전송 후 로컬 파일을 삭제할 경우 작성   기존 파일은 안지우고 그냥 바꿔치기 해도 되는가
+												remoteDirectory: "backend",  //파일을 전송할 원격지 경로  
+												execCommand: "pm2 stop raas_be; pm2 start backend/app.json"       //원격지에서 실행할 커맨드  pm2 stop 후 pm2 start 
+											),
+										sshTransfer(		
+													execCommand: "cp -r backend/backup backend/`date +%Y-%m-%d_%H:%M:%S`/"    //날짜별로 폴더를 만들어서 백업  mkdir /raas/backend/`date +%Y-%m-%d_%H:%M:%S`   
+												)											
+										]
+								)
+							 ]
+					)
+				}	
+            }
+            
+		}
+		
+		stage("Deploy master") {
+            when { branch 'master' }
+			steps([$class: 'BapSshPromotionPublisherPlugin']) {
+				container('main'){
+					sshPublisher(
+						continueOnError: false, 
+						failOnError: true,
+						publishers: [
+								sshPublisherDesc(
+									 configName: "RAAS_WCS_PRD1",              //Jenkins에 등록한 서버명
+									 verbose: true,
+									transfers: [
+										sshTransfer(		
+												execCommand: "pwd;ls -al backend;mv backend/SmartWCS-0.0.1-SNAPSHOT.jar backend/backup/SmartWCS-0.0.1-SNAPSHOT.jar"       //1. backup 폴더에 파일을 복사함   
+											),									
+										sshTransfer(									   //2. 파일을 전송하고 pm2를 다시 실행함		
+												sourceFiles: "build/libs/SmartWCS-0.0.1-SNAPSHOT.jar",       //전송할 파일은 대체 어디 경로에서 가져오는가?
+												removePrefix: "build/libs",                       //전송 후 로컬 파일을 삭제할 경우 작성   기존 파일은 안지우고 그냥 바꿔치기 해도 되는가
+												remoteDirectory: "backend",  //파일을 전송할 원격지 경로  
+												execCommand: "pm2 stop raas_be; pm2 start backend/app.json"       //원격지에서 실행할 커맨드  pm2 stop 후 pm2 start 
+											),
+										sshTransfer(		
+													execCommand: "cp -r backend/backup backend/`date +%Y-%m-%d_%H:%M:%S`/"    //날짜별로 폴더를 만들어서 백업  mkdir /raas/backend/`date +%Y-%m-%d_%H:%M:%S`   
+												)												
+										]
+								)
+							 ]
+					)
+				}	
+            }
+            
+		}
+		
+		stage("uCoverage dev") {
+            when { branch 'dev-xxxx' }
+			steps([$class: 'BapSshPromotionPublisherPlugin']) {
+				container('main'){
+					sshPublisher(
+						continueOnError: false, 
+						failOnError: true,
+						publishers: [
+								sshPublisherDesc(
+									 configName: "RAAS_WCS_UCOVERAGE",              //Jenkins에 등록한 서버명
+									 verbose: true,
+									transfers: [																	
+										sshTransfer(									   //2. 파일을 전송하고 pm2를 다시 실행함		
+												sourceFiles: "build/classes/java/main/com",       //전송할 파일은 대체 어디 경로에서 가져오는가?
+												removePrefix: "",                       //전송 후 로컬 파일을 삭제할 경우 작성   기존 파일은 안지우고 그냥 바꿔치기 해도 되는가
+												remoteDirectory: ""  //파일을 전송할 원격지 경로  
+											   
+											)									
+										]
+								)
+							 ]
+					)
+				}	
+            }
+            
+		}
+		
+		/*
+		stage("Health check dev/stg") {
+            when { 
+                anyOf {
+                    branch 'dev'
+					branch 'stage'
+                }				
+			}
+            steps {
+                script {
+					//sh 'cat /etc/issue'
+                    sh 'apt-get update; apt-get install -y sshpass'
+                    def retryLimit = 20
+                    def retryCount = 0
+                    ipAddr = "10.2.115.3"
+					if(BRANCH_NAME == 'dev') {
+						ipAddr = "10.2.115.3"
+					} else if(BRANCH_NAME == 'stg') {
+						ipAddr = "10.2.115.19"
+					}
+                    waitUntil {
+                        def result ;
+                        withCredentials([string(credentialsId: "raas_ssh_password", variable: "raasSshPassword")]) {
+                            //result = sh(script: "sshpass -p '${raasSshPassword}' ssh -T -o StrictHostKeyChecking=no raas_admin@" + ipAddr + " -p 'curl -i http://localhost:9306 | grep 200 | wc -l'", returnStdout: true).trim()
+							result= sh(script: "sshpass -p '${raasSshPassword}' ssh -T -o StrictHostKeyChecking=no raas_admin@" + ipAddr + " \"curl -o /dev/null -w '\\n%{http_code}' http://localhost:8090\""
+									   , returnStdout: true).trim().tokenize("\n")
+                        }
+                        retryCount++
+                        print("result============================================\n"+result)
+
+                        if (result[0].toInteger() == 200 || result[0].toInteger() == 403 || result[0].toInteger() == 401) {
+							echo 'Health check dev/stg OK!!!!!!!!!!!!!!!!!\n'
+                            return true
+                        } else {
+                            if (retryCount >= retryLimit){
+                                return true
+                            } else {
+                                return false
+                            }
+                        }
+                    }
+                }
+            }
+            
+		}	
+		
+		stage("Health check stage") {
+            when {
+                anyOf {
+                    branch 'stage'
+                }
+            }
+			steps([$class: 'BapSshPromotionPublisherPlugin']) {
+                container('main'){
+					sshPublisher(
+						continueOnError: false, 
+						failOnError: true,
+						publishers: [
+								sshPublisherDesc(
+									 configName: "RAAS_WCS_STG1",              //Jenkins에 등록한 서버명
+									 verbose: true,
+									transfers: [
+										sshTransfer(		
+												execCommand: "curl -i http://localhost:8090 | grep 200 | wc -l"       //3. health Check 함  health check 실패했는지 어떻게 return을 받을까?  실패 시 retry를 20번 정도 하고 싶은데 방법이 있을까?
+											),									
+										sshTransfer(								                                               
+												execCommand: "cp /raas/backend/backup/SmartWCS-0.0.1-SNAPSHOT.jar /raas/backend/SmartWCS-0.0.1-SNAPSHOT.jar"      //4. health check 실패시 파일을 원복 함		
+											),		
+										sshTransfer(								                                               
+												execCommand: "pm2 stop raas_backend; pm2 start /raas/backend/app.json"       //원격지에서 실행할 커맨드  pm2 stop 후 pm2 start 		
+											)											
+										]
+								)
+							 ]
+					)
+				}	
+            }
+            
+		}	
+		
+		stage("[#01] Health check prod") {
+            when { branch 'master' }
+            steps {
+                script {
+                    sh 'sudo apt-get install sshpass'
+                    def retryLimit = 20
+                    def retryCount = 0
+                    ipAddr = "10.2.113.204"
+                    waitUntil {
+                        def result = 0;
+                        withCredentials([string(credentialsId: "raas_ssh_password", variable: "raasSshPassword")]) {
+                            result = sh(script: "sshpass -p '${raasSshPassword}' ssh -T -o StrictHostKeyChecking=no raas_admin@" + ipAddr + " -p 'curl -i http://localhost:9306 | grep 200 | wc -l'", returnStdout: true).trim()
+                        }
+                        retryCount++
+                        print("result=="+result)
+
+                        if (result.toInteger() >= 1) {
+                            return true
+                        } else {
+                            if (retryCount >= retryLimit){
+                                return true
+                            } else {
+                                return false
+                            }
+                        }
+                    }
+                }
+            }
+        }  
+		*/
+        
+
+        
+    }
+}
+
+void print(message) {
+    echo "${message}"
+}

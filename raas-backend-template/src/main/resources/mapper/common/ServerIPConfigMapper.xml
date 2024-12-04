@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lgcns.smartwcs.common.repository.ServerIPConfigMapper">
+
+    <select id="getAutostoreIpList" resultType="com.lgcns.smartwcs.common.model.AutoStoreServer">
+        /* SELECT getAutostoreIpList */
+        <![CDATA[
+        SELECT CONCAT(a.CO_CD, a.CNTR_CD, a.EQP_ID) AS serverKey
+             , TRIM(a.IF_SERV_IP) AS asIfIp
+        FROM wcsdb.TB_COM_EQP_MST a
+        WHERE a.IF_SERV_IP <> ''
+        AND a.IF_SERV_IP IS NOT NULL
+        ]]>
+    </select>
+
+    <select id="getWmsUrlList" resultType="com.lgcns.smartwcs.common.model.WmsServer">
+        /* SELECT getWmsUrlList */
+        <![CDATA[
+        SELECT a.CO_CD as serverKey
+             ,a.WMS_IF_ID as wmsIfId
+             ,a.WMS_IF_URL as wmsIfUrl
+        FROM wcsdb.TB_COM_WMS_URL a
+        WHERE a.WMS_IF_URL IS NOT NULL
+          AND a.WMS_IF_URL <> ''
+        ORDER BY a.CO_CD
+        ]]>
+    </select>
+</mapper>

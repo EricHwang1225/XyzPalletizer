@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lgcns.smartwcs.dash_board.repository.MainMenuListMapper">
+
+    <select id="getMenuList"
+            parameterType="com.lgcns.smartwcs.dash_board.model.MainMenuList"
+            resultType="com.lgcns.smartwcs.common.utils.UnderscoreToCamelHashMap">
+        <![CDATA[
+        /* SELECT getMenuList */
+        SELECT H.MENU_ID        AS MENU_ID,
+               H.MENU_NM        AS MENU_NM,
+               H.MENU_URL       AS MENU_URL,
+               H.MAIN_SHOW_ICON AS MAIN_SHOW_ICON
+        FROM (SELECT D.CO_CD                                          AS CO_CD,
+                     A.MENU_ID                                        AS MENU_ID,
+                     IFNULL((SELECT MAX(L.MENU_LANG_NM)
+                             FROM wcsdb.TB_COM_LANG_MENU_MPNG L
+                             WHERE L.LANG_CD = #{langCd}
+                               AND L.MENU_ID = A.MENU_ID), A.MENU_NM) AS MENU_NM,
+                     A.MENU_URL                                       AS MENU_URL,
+                     A.MENU_LVL                                       AS MENU_LVL,
+                     A.SORT_SEQ                                       AS SORT_SEQ,
+                     A.MAIN_SHOW_ICON                                 AS MAIN_SHOW_ICON
+              FROM TB_COM_MENU_MST A
+                       JOIN(SELECT B.CO_CD,
+                                   C.MENU_ID
+                            FROM TB_COM_TENANT_MST B
+                                     JOIN TB_COM_TENANT_MENU_MPNG C
+                                          ON B.CO_CD = C.CO_CD
+                            WHERE 1 = 1
+                              AND B.CO_CD = #{coCd}
+                              AND C.USE_YN = 'Y') D
+                           ON A.MENU_ID = D.MENU_ID
+              WHERE A.USE_YN = 'Y'
+                AND A.USER_LVL IN (3, 5, 6, 7)
+                AND A.MENU_LVL = 2) H
+                 LEFT OUTER JOIN (SELECT E.CO_CD        AS CO_CD,
+                                         F.MENU_ID      AS MENU_ID,
+                                         F.ROLE_MENU_CD AS ROLE_MENU_CD,
+                                         F.MAIN_SHOW_YN AS MAIN_SHOW_YN
+                                  FROM TB_COM_ROLE_MST E
+                                           JOIN TB_COM_ROLE_MENU_MPNG F
+                                                ON E.CO_CD = F.CO_CD
+                                                    AND E.CNTR_CD = F.CNTR_CD
+                                                    AND E.ROLE_CD = F.ROLE_CD
+                                  WHERE 1 = 1
+                                    AND E.CO_CD = #{coCd}
+                                    AND E.CNTR_CD = #{cntrCd}
+                                    AND E.ROLE_CD = #{roleCd}
+                                    AND F.ROLE_MENU_CD IN ('A', 'R')) G
+                                 ON H.CO_CD = G.CO_CD
+                                     AND H.MENU_ID = G.MENU_ID
+        WHERE 1 = 1
+          AND MAIN_SHOW_YN = 'Y'
+        ORDER BY H.SORT_SEQ
+        ;
+        ]]>
+
+    </select>
+</mapper>

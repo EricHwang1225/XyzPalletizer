@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lgcns.smartwcs.common.repository.SequenceMapper">
+
+    <select id="getInbdUid" resultType="int">
+        /* SELECT getInbdUid */
+        SELECT nextval('SEQ_INBD_MST_UID') FROM DUAL;
+    </select>
+
+    <select id="getObndUid" resultType="int">
+        /* SELECT getObndUid */
+        SELECT nextval('SEQ_OBND_MST_UID') FROM DUAL;
+    </select>
+
+    <select id="getSttkUid" resultType="int">
+        /* SELECT getSttkUid */
+        SELECT nextval('SEQ_STTK_MST_UID') FROM DUAL;
+    </select>
+
+    <select id="getTaskGroupId" resultType="int">
+        /* SELECT getTaskGroupId */
+        SELECT nextval('SEQ_TASKGROUP') FROM DUAL;
+    </select>
+
+    <select id="getTaskId" resultType="int">
+        /* SELECT getTaskId */
+        SELECT nextval('SEQ_TASK') FROM DUAL;
+    </select>
+
+    <select id="getTaskUid" resultType="int">
+        /* SELECT getTaskUid */
+        SELECT nextval('SEQ_AS_TASK_UID') FROM DUAL;
+    </select>
+
+    <select id="getPtwyUid" resultType="int">
+        /* SELECT getPtwyUid */
+        SELECT nextval('SEQ_INBD_PTWY_UID') FROM DUAL;
+    </select>
+
+    <select id="getPickUid" resultType="int">
+        /* SELECT getPtwyUid */
+        SELECT nextval('SEQ_OBND_PICK_UID') FROM DUAL;
+    </select>
+
+    <select id="getWcsTrackingId" resultType="int">
+        /* SELECT getWcsTrackingId */
+        SELECT nextval('SEQ_TRACKING_UID') FROM DUAL;
+    </select>
+
+    <select id="getAbnormUid" resultType="int">
+        /* SELECT getAbnormUid */
+        SELECT nextval('SEQ_ABNORM_UID') FROM DUAL;
+    </select>
+</mapper>

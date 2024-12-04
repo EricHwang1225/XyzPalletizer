@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lgcns.smartwcs.wms_url.repository.WmsUrlMapper">
+
+    <select id="getWmsUrlTotalCnt"
+            parameterType="com.lgcns.smartwcs.wms_url.model.WmsUrlSearchCondition"
+            resultType="java.lang.Integer">
+        /* SELECT getWmsUrlTotalCnt */
+        SELECT COUNT(*)
+        FROM wcsdb.TB_COM_WMS_URL a JOIN wcsdb.TB_COM_TENANT_MST b
+        ON (a.CO_CD = b.CO_CD)
+        WHERE 1 = 1
+        <if test="coNm != null and coNm != '' ">
+            AND b.CO_NM LIKE CONCAT('%', #{coNm}, '%')
+        </if>
+        <if test="wmsIfId != null and wmsIfId != '' ">
+            AND a.WMS_IF_ID = #{wmsIfId}
+        </if>
+        <if test="wmsIfUrl != null and wmsIfUrl != '' ">
+            AND a.WMS_IF_URL LIKE CONCAT('%', #{wmsIfUrl}, '%')
+        </if>
+    </select>
+
+    <select id="getWmsUrlList"
+            parameterType="com.lgcns.smartwcs.wms_url.model.WmsUrlSearchCondition"
+            resultType="com.lgcns.smartwcs.common.utils.UnderscoreToCamelHashMap">
+        /* SELECT getWmsUrlList */
+        SELECT #{coCd} AS CO_CD
+        ,a.COM_DTL_CD AS WMS_IF_ID
+        ,a.COM_DTL_NM AS WMS_IF_NM
+        ,b.WMS_IF_URL AS WMS_IF_URL
+        FROM wcsdb.TB_COM_CODE_MST a LEFT OUTER JOIN wcsdb.TB_COM_WMS_URL b
+        ON ( a.COM_DTL_CD = b.WMS_IF_ID
+        AND b.CO_CD = #{coCd})
+        WHERE 1 = 1
+        AND a.COM_HDR_CD = 'WMS_IF_ID'
+        AND a.HDR_FLAG = 'N'
+        AND a.USE_YN = 'Y'
+        ORDER BY a.SORT_SEQ
+        <if test="size != null and page != null ">
+            LIMIT #{size} OFFSET #{page}
+        </if>
+    </select>
+
+    <insert id="saveWmsUrl" parameterType="com.lgcns.smartwcs.wms_url.model.WmsUrl">
+        /* MERGE saveWmsUrl */
+        INSERT INTO TB_COM_WMS_URL (CO_CD, WMS_IF_ID, WMS_IF_URL, REG_ID, REG_DT, UPD_ID, UPD_DT)
+        values (#{coCd}, #{wmsIfId}, #{wmsIfUrl}, #{regId}, #{regDt}, #{regId}, #{regDt}) ON DUPLICATE KEY
+        UPDATE WMS_IF_URL = #{wmsIfUrl}
+            , UPD_ID = #{regId}
+            , UPD_DT = #{regDt};
+    </insert>
+
+    <select id="getWmsUrlExcelList"
+            parameterType="com.lgcns.smartwcs.wms_url.model.WmsUrlSearchCondition"
+            resultType="com.lgcns.smartwcs.common.utils.UnderscoreToCamelHashMap">
+        /* SELECT getWmsUrlExcelList */
+        SELECT a.CO_CD AS CO_CD
+        , a.CO_NM AS CO_NM
+        , b.COM_DTL_CD AS WMS_IF_ID
+        , b.COM_DTL_NM AS WMS_IF_NM
+        , c.WMS_IF_URL AS WMS_IF_URL
+        FROM wcsdb.TB_COM_TENANT_MST a JOIN wcsdb.TB_COM_CODE_MST b
+        ON (b.COM_HDR_CD = 'WMS_IF_ID'
+        AND b.HDR_FLAG = 'N'
+        AND b.USE_YN = 'Y')
+        LEFT OUTER JOIN wcsdb.TB_COM_WMS_URL c
+        ON (a.CO_CD = c.CO_CD
+        AND b.COM_DTL_CD = c.WMS_IF_ID)
+        WHERE 1 = 1
+        <![CDATA[
+          AND a.CO_CD <> 'LGWCS'
+          ]]>
+        AND a.USE_YN = 'Y'
+        <if test="searchCoCd != null and searchCoCd != '' ">
+            AND a.CO_CD LIKE CONCAT('%', #{searchCoCd}, '%')
+        </if>
+        <if test="coNm != null and coNm != '' ">
+            AND a.CO_NM LIKE CONCAT('%', #{coNm}, '%')
+        </if>
+        ORDER BY a.CO_CD, b.SORT_SEQ
+    </select>
+</mapper>

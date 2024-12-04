@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lgcns.smartwcs.role.repository.RoleMenuMappingMapper">
+
+    <select id="getRoleMenuList" parameterType="com.lgcns.smartwcs.role.model.RoleMenuSearchCondition"
+            resultType="com.lgcns.smartwcs.common.utils.UnderscoreToCamelHashMap">
+        <![CDATA[
+        /* SELECT getRoleMenuList */
+        SELECT H.MENU_ID AS MENU_ID,
+               IFNULL((SELECT MAX(L.MENU_LANG_NM)
+                       FROM wcsdb.TB_COM_LANG_MENU_MPNG L
+                       WHERE 1= 1
+                         AND L.LANG_CD = #{langCd}
+                         AND L.MENU_ID = H.MENU_ID), H.MENU_NM) AS MENU_NM,
+               IFNULL((SELECT MAX(L.MENU_LANG_DESC)
+                       FROM wcsdb.TB_COM_LANG_MENU_MPNG L
+                       WHERE 1= 1
+                         AND L.LANG_CD = #{langCd}
+                         AND L.MENU_ID = H.MENU_ID), H.MENU_DESC) AS MENU_DESC,
+               H.TREE_ID AS TREE_ID,
+               H.PARENT_ID AS PARENT_ID,
+               IFNULL(G.ROLE_MENU_CD, 'N') AS ROLE_MENU_CD,
+               IFNULL(G.MAIN_SHOW_YN, 'N') AS MAIN_SHOW_YN
+        FROM (SELECT D.CO_CD AS CO_CD,
+                     A.MENU_ID AS MENU_ID,
+                     A.MENU_NM AS MENU_NM,
+                     A.MENU_DESC AS MENU_DESC,
+                     A.TREE_ID AS TREE_ID,
+                     A.PARENT_ID AS PARENT_ID,
+                     A.MENU_LVL AS MENU_LVL,
+                     A.SORT_SEQ AS SORT_SEQ
+              FROM TB_COM_MENU_MST A  JOIN(SELECT B.CO_CD,
+                                                  C.MENU_ID
+                                           FROM TB_COM_TENANT_MST B  JOIN TB_COM_TENANT_MENU_MPNG C
+                                                                          ON B.CO_CD = C.CO_CD
+                                           WHERE 1 = 1
+                                             ]]>
+                                            <if test="coCd != null and coCd != '' ">
+                                                <![CDATA[
+                                                  AND B.CO_CD = #{coCd}
+                                                ]]>
+                                            </if>
+                                            <![CDATA[
+                                             AND C.USE_YN = 'Y') D
+                                             ON A.MENU_ID = D.MENU_ID
+              WHERE A.USE_YN = 'Y'
+                AND A.USER_LVL IN (3, 5, 6, 7)) H LEFT OUTER JOIN (SELECT E.CO_CD AS CO_CD,
+                                                                          F.MENU_ID AS MENU_ID,
+                                                                          F.ROLE_MENU_CD AS ROLE_MENU_CD,
+                                                                          F.MAIN_SHOW_YN AS MAIN_SHOW_YN
+                                                                   FROM TB_COM_ROLE_MST E  JOIN TB_COM_ROLE_MENU_MPNG F
+                                                                                                ON E.CO_CD = F.CO_CD
+                                                                                                    AND E.CNTR_CD = F.CNTR_CD
+                                                                                                    AND E.ROLE_CD = F.ROLE_CD
+                                                                   WHERE 1 = 1
+                                                                     ]]>
+                                                                    <if test="coCd != null and coCd != '' ">
+                                                                        <![CDATA[
+                                                                          AND E.CO_CD = #{coCd}
+                                                                        ]]>
+                                                                    </if>
+                                                                    <if test="cntrCd != null and cntrCd != '' ">
+                                                                        <![CDATA[
+                                                                          AND E.CNTR_CD = #{cntrCd}
+                                                                        ]]>
+                                                                    </if>
+                                                                    <if test="roleCd != null and roleCd != '' ">
+                                                                        <![CDATA[
+                                                                         AND E.ROLE_CD = #{roleCd}
+                                                                        ]]>
+                                                                    </if>
+                                                                    <![CDATA[
+                                                                     ) G
+                                                                  ON H.CO_CD = G.CO_CD
+                                                                  AND H.MENU_ID = G.MENU_ID
+        ORDER BY H.MENU_LVL, H.SORT_SEQ
+        ;
+        ]]>
+    </select>
+
+    <insert id="saveRoleMenu" parameterType="com.lgcns.smartwcs.role.model.RoleMenu">
+        /* MERGE saveRoleMenu */
+        INSERT INTO TB_COM_ROLE_MENU_MPNG (CO_CD, CNTR_CD, ROLE_CD, MENU_ID, ROLE_MENU_CD , MAIN_SHOW_YN, REG_ID, REG_DT, UPD_ID, UPD_DT)
+        values (#{coCd}, #{cntrCd}, #{roleCd}, #{menuId},  #{roleMenuCd}, #{mainShowYn}, #{regId}, #{regDt}, #{regId}, #{regDt})
+            ON DUPLICATE KEY
+        UPDATE ROLE_MENU_CD = #{roleMenuCd}
+            ,  MAIN_SHOW_YN = #{mainShowYn}
+            , UPD_ID = #{regId}
+            , UPD_DT = #{regDt};
+    </insert>
+
+</mapper>

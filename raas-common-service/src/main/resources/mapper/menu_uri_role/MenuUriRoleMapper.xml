@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lgcns.smartwcs.menu_uri_role.repository.MenuUriRoleMapper">
+
+    <select id="getMenuUriRoleUnpagedList"
+            parameterType="com.lgcns.smartwcs.menu_uri_role.model.MenuUriRoleSearchCondition"
+            resultType="com.lgcns.smartwcs.menu.model.Menu">
+        <![CDATA[
+        /* SELECT getMenuUriRoleUnpagedList */
+        WITH TBL AS
+                 (SELECT 'COM_METHOD' AS MENU_ID
+                       , 'COMMON'     AS MENU_NM
+                  UNION
+                  SELECT a.MENU_ID AS MENU_ID
+                       , a.MENU_NM AS MENU_NM
+                  FROM wcsdb.TB_COM_MENU_MST a
+                  WHERE a.MENU_LVL = 2
+                    AND a.USE_YN = 'Y')
+
+
+        SELECT *
+        FROM TBL a
+        WHERE 1 = 1
+          ]]>
+        <if test="menuId != null and menuId != ''  ">
+            <![CDATA[
+          AND a.MENU_ID LIKE CONCAT('%', #{menuId}, '%')
+                  ]]>
+        </if>
+        <if test="menuNm != null and menuNm != ''  ">
+            <![CDATA[
+          AND a.MENU_NM LIKE CONCAT('%', #{menuNm}, '%')
+                   ]]>
+        </if>
+        <if test="(uri != null and uri != ''  )||(useYn != null and useYn != '' ) ">
+            AND EXISTS (SELECT 1
+            FROM wcsdb.TB_COM_METHOD_MST b
+            WHERE a.MENU_ID = b.MENU_ID
+            <if test="useYn != null and useYn != '' ">
+                <![CDATA[
+                AND b.USE_YN = #{useYn}
+                ]]>
+            </if>
+            <if test="uri != null and uri != '' ">
+                <![CDATA[
+                AND b.URI LIKE CONCAT('%', #{uri}, '%')
+            ]]>
+            </if>
+            )
+        </if>
+        ;
+
+    </select>
+
+
+</mapper>

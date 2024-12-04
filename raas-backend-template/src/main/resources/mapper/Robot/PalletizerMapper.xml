@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lgcns.smartwcs.xyzPalletizer.reporsitory.PalletizerReporsitory">
+
+    <insert id="insertInterfaceLog" parameterType="com.lgcns.smartwcs.xyzPalletizer.model.WcsIfDTO">
+        INSERT INTO palletizer2.tb_pamr_wcs_if_log
+        (WCS_IF_LOG_NO, WCS_IF_NM, WCS_IF_TRAK_NO, PICK_NO, WCS_IF_JSON, WMS_IF_YN, WMS_IF_STAT_CD, WMS_IF_CNT, WMS_IF_DT, WMS_IF_MSG, REG_ID, REG_DT, WMS_IF_JSON)
+        VALUES(0, '', '', '', '', 'N', '', 0, '', '', 'SMARTWCS', CURRENT_TIMESTAMP, '');
+    </insert>
+
+    <insert id="insertPalletData" parameterType="com.lgcns.smartwcs.xyzPalletizer.model.LogPltInfo">
+        INSERT INTO palletizer2.tb_palletizer_log_plt
+        (CO_CD, CNTR_CD, PLT_ID, LOC_CD, STS_CD, CHUTE_NUM, ORDER_ID, REG_ID, REG_DT, UPD_ID, UPD_DT)
+        VALUES ('1', '1', #{plt_id}, #{loc_cd}, #{sts_cd},0, #{order_id}, 'SMARTWCS', CURRENT_TIMESTAMP, 'SMARTWCS', CURRENT_TIMESTAMP);
+    </insert>
+
+    <insert id="insertBoxData" parameterType="com.lgcns.smartwcs.xyzPalletizer.model.LogSkuInfo">
+        INSERT INTO palletizer2.tb_palletizer_log_sku
+        (CO_CD, CNTR_CD, BOX_ID, BCR1, LOC_CD1, CHUTE_NUM, STS_CD, PLTID, REG_ID, REG_DT, UPD_ID, UPD_DT, BCR2, LOC_CD2)
+        VALUES('1', '1', #{id},  #{bcr1}, #{category}, 0,  #{sts_cd}, #{palletId}, 'SMARTWCS', CURRENT_TIMESTAMP, 'SMARTWCS', CURRENT_TIMESTAMP, '0', '0');
+    </insert>
+
+    <update id="completeBoxInPallet">
+        UPDATE palletizer2.tb_palletizer_log_sku
+        SET STS_CD = '100'
+        WHERE PLTID=#{pltId} AND STS_CD='50';
+    </update>
+
+    <insert id="uploadSkuInfo" parameterType="com.lgcns.smartwcs.xyzPalletizer.model.SkuMasterInfo">
+        INSERT INTO palletizer2.tb_com_sku_mst
+        (CO_CD, CST_CD, SKU_CD, SKU_NM, CATAGORY, SKU_CNTR_NM, UOM_CD, UOM_QTY, WIDTH, `LENGTH`, HEIGHT, CBM, GROSS_WEIGHT, NET_WEIGHT, BOX_GROSS_WEIGHT, BOX_NET_WEIGHT, UOM_LEN, UOM_CBM, UOM_WEIGHT, SKU_GRP_01, SKU_GRP_02, BOX_IN_QTY, UNUSUAL_YN, PROD_CD, IMAGE_URL, SKU_STACK_METHOD, ALLOC_STRAT_CD, EXPIRATION_MANAGEMENT_TYPE, USE_YN, REG_ID, REG_DT, UPD_ID, UPD_DT, SKU_CD2, SKU_CD3, SKU_CD4)
+        VALUES(#{co_cd}, #{cst_cd}, #{box_bcr}, #{sku_name}, #{category}, '', '', 0, #{width}, #{length}, #{height}, 0, 0, #{weight}, 0, 0, '', '', '', '', '', 0, '', '', '', '', ' ', '', 'Y', 'SMARTWCS', #{reg_dt}, 'SMARTWCS', CURRENT_TIMESTAMP, #{logics_bcr},'', '')
+            ON DUPLICATE KEY UPDATE
+                                 SKU_NM = VALUES(SKU_NM),
+                                 CATAGORY = VALUES(CATAGORY),
+                                 WIDTH = VALUES(WIDTH),
+                                 `LENGTH` = VALUES(`LENGTH`),
+                                 HEIGHT = VALUES(HEIGHT),
+                                 NET_WEIGHT = VALUES(NET_WEIGHT),
+                                 SKU_CD2 = VALUES(SKU_CD2);
+    </insert>
+
+    <insert id="insertOrderInfo" parameterType="com.lgcns.smartwcs.xyzPalletizer.model.OrderInfo">
+        INSERT INTO palletizer2.tb_palletizer_log_order
+        (CO_CD, CNTR_CD, ORDER_ID, ORDER_TYPE, STS_CD, CHUTE_NUM, REG_ID, REG_DT, UPD_ID, UPD_DT)
+        VALUES('1', '1', #{params.orderInfo.order_id}, #{params.orderInfo.order_type}, #{params.orderStsCd}, 0, 'SMARTWCS', CURRENT_TIMESTAMP, 'SMARTWCS', CURRENT_TIMESTAMP);
+    </insert>
+
+    <update id="updatePalletData"></update>
+
+    <select id="getPalletPid" resultType="java.lang.String"></select>
+
+    <select id="getPltStsCd" resultType="java.lang.String">
+
+    </select>
+
+    <select id="getSkuInfo" resultType="com.lgcns.smartwcs.xyzPalletizer.model.SkuInfo"></select>
+    <select id="getOrderId" resultType="java.lang.String">
+        SELECT ORDER_ID
+        FROM palletizer2.tb_palletizer_log_order
+        WHERE STS_CD = '10';
+    </select>
+    <select id="getLocCd" resultType="java.lang.String">
+        SELECT CATAGORY
+        FROM palletizer2.tb_com_sku_mst
+        WHERE SKU_CD = #{bcr1}
+        UNION
+        SELECT CATAGORY
+        FROM palletizer2.tb_com_sku_mst
+        WHERE SKU_CD2 = #{bcr2}
+            LIMIT 1;
+    </select>
+    <select id="getPltID" resultType="java.lang.String">
+        SELECT PLT_ID
+        FROM palletizer2.tb_palletizer_log_plt
+        WHERE LOC_CD = #{toWs} AND STS_CD = #{sts_cd1}
+
+        UNION
+
+        SELECT PLT_ID
+        FROM palletizer2.tb_palletizer_log_plt
+        WHERE LOC_CD = #{toWs} AND STS_CD = #{sts_cd2}
+          AND NOT EXISTS (
+            SELECT 1
+            FROM palletizer2.tb_palletizer_log_plt
+            WHERE LOC_CD = #{toWs} AND STS_CD = #{sts_cd1}
+        );
+    </select>
+
+</mapper>
+
+
