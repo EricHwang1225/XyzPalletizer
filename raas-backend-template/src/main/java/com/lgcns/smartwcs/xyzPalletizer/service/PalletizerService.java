@@ -143,7 +143,7 @@ public class PalletizerService {
         throw new RuntimeException(e);
       }
 
-      if (response.getCode() != 99) {
+      if (readyResponse.getCode() != 99) {
         try {
           String json = mapper.writeValueAsString(reqDTO);
           response.setCode(999);
@@ -481,13 +481,16 @@ public class PalletizerService {
     switch (result){
       case 1 :
         log.info("CV Start");
-        case 2 :
-          log.info("Barcode Noread");
-          case 3 :
-            log.info("Order ID error. Multiple Order ID");
-            case 4 :
-              log.info("No Destination");
-              break;
+        break;
+      case 2 :
+        log.info("Barcode Noread");
+        break;
+      case 3 :
+        log.info("Order ID error. Multiple Order ID");
+        break;
+      case 4 :
+        log.info("No Destination");
+        break;
       default:
         plcResult = "00";
     }
